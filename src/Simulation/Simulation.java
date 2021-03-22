@@ -26,6 +26,9 @@ import org.netbeans.xml.schema.updateschema.TPosition;
  * @author adroc
  */
 public class Simulation extends Thread {
+    
+    private static final int XLIMIT = 14;
+    private static final int YLIMIT = 14;
 
     private TPlace[][] myEnvironment;
     private EnvironmentGUI myGUI;
@@ -34,7 +37,7 @@ public class Simulation extends Thread {
     private int simulationSpeed;
 
     public Simulation(int Cows, int Wolfs, int Obstacles, int speed) {
-        myEnvironment = new TPlace[15][15];
+        myEnvironment = new TPlace[XLIMIT + 1][YLIMIT + 1];
         int obstacles = Obstacles;
         int wolfs = Wolfs;
         int cows = Cows;
@@ -369,6 +372,80 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the cow directly in this method
         
+        Random rand = new Random();
+        TPlace place = currentMyPlace.getPlace().get(0); // neighbour TPlaces slide along with center piece
+        if (place.getGrass() == 0) { 
+            TPosition position = place.getPosition();
+            int x = position.getXx();
+            int y = position.getYy();
+            
+            System.out.println("(" + x + ", " + y + ")");
+            
+            boolean validDirection = false;
+            while (!validDirection) {
+                int direction = rand.nextInt(7);
+                
+                switch (direction) {
+                    case 0 -> { // UP LEFT
+                        if (x - 1 > 0 && y + 1 < YLIMIT) {
+                            position.setXx(x - 1);
+                            position.setYy(y + 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 1 -> { // UP
+                        if (y + 1 < YLIMIT) {
+                            position.setYy(y + 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 2 -> { // UP RIGHT
+                        if (x + 1 < XLIMIT && y + 1 < YLIMIT) {
+                            position.setXx(x + 1);
+                            position.setYy(y + 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 3 -> { // LEFT
+                        if (x - 1 > 0) {
+                            position.setXx(x - 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 4 -> { // RIGHT
+                        if (x + 1 < XLIMIT) {
+                            position.setXx(x + 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 5 -> { // DOWN LEFT
+                        if (x - 1 > 0 && y - 1 > 0) {
+                            position.setXx(x - 1);
+                            position.setYy(y - 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 6 -> { // DOWN
+                        if (y - 1 > 0) {
+                            position.setYy(y - 1);
+                            validDirection = true;
+                        }
+                    }
+                    case 7 -> { // DOWN RIGHT
+                        if (x + 1 < XLIMIT && y - 1 > 0) {
+                            position.setXx(x + 1);
+                            position.setYy(y - 1);
+                            validDirection = true;
+                        }
+                    } 
+                }
+            }
+            
+            return currentMyPlace;
+        } else {
+            return currentMyPlace;
+        }
+        
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
@@ -378,7 +455,7 @@ public class Simulation extends Thread {
         //Deserilize result string to TMyPlace
         //return received TMyPlace
       
-        return null;
+        //return null;
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
