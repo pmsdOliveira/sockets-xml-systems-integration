@@ -371,16 +371,16 @@ public class Simulation extends Thread {
     private TMyPlace updateCowPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
         //TODO Lab 1:
         //Update the position of the cow directly in this method
-        ArrayList<TPlace> places = new ArrayList<TPlace>();
+        ArrayList<TPosition> positions = new ArrayList<TPosition>();
         for (TPlace place : currentMyPlace.getPlace()) {
             if (!(place.isCow() || place.isWolf() || place.isObstacle() || place.getGrass() == 0)) {
-                places.add(place);
+                positions.add(place.getPosition());
             }
         }
         
         Random rand = new Random();
-        int destinationIndex = rand.nextInt(places.size());
-        TPosition destination = places.get(destinationIndex).getPosition();
+        int destinationIndex = rand.nextInt(positions.size());
+        TPosition destination = positions.get(destinationIndex);
         
         TMyPlace nextMyPlace = currentMyPlace;
         nextMyPlace.getPlace().get(0).setPosition(destination);
@@ -401,8 +401,7 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the wolf directly in this 
         TPosition destination = new TPosition();
-        
-        ArrayList<TPlace> places = new ArrayList<TPlace>();
+        ArrayList<TPosition> positions = new ArrayList<TPosition>();
         for (TPlace place : currentMyPlace.getPlace()) {
             if (place.isCow()) {
                 destination = place.getPosition();
@@ -412,13 +411,13 @@ public class Simulation extends Thread {
                 
                 return nextMyPlace;
             } else if (!(place.isWolf() || place.isObstacle())) {
-                places.add(place);
+                positions.add(place.getPosition());
             }
         }
         
         Random rand = new Random();
-        int destinationIndex = rand.nextInt(places.size());
-        destination = places.get(destinationIndex).getPosition();
+        int destinationIndex = rand.nextInt(positions.size());
+        destination = positions.get(destinationIndex);
         
         TMyPlace nextMyPlace = currentMyPlace;
         nextMyPlace.getPlace().get(0).setPosition(destination);
