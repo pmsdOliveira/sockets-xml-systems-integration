@@ -379,8 +379,15 @@ public class Simulation extends Thread {
         }
         
         Random rand = new Random();
-        int destinationIndex = rand.nextInt(positions.size());
-        TPosition destination = positions.get(destinationIndex);
+        TPosition destination;
+        while (true) {
+            int destinationIndex = rand.nextInt(positions.size());
+            destination = positions.get(destinationIndex);
+            if (destination.getXx() >= 0 && destination.getXx() <= XLIMIT && 
+                destination.getYy() >= 0 && destination.getYy() <= YLIMIT) {
+                break;
+            }
+        }
         
         TMyPlace nextMyPlace = currentMyPlace;
         nextMyPlace.getPlace().get(0).setPosition(destination);
@@ -401,9 +408,10 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the wolf directly in this 
         TPosition destination = new TPosition();
-        ArrayList<TPosition> positions = new ArrayList<TPosition>();
+        ArrayList<TPosition> positions = new ArrayList<>();
         for (TPlace place : currentMyPlace.getPlace()) {
             if (place.isCow()) {
+                System.out.println("Found cow");
                 destination = place.getPosition();
                 
                 TMyPlace nextMyPlace = currentMyPlace;
@@ -415,13 +423,31 @@ public class Simulation extends Thread {
             }
         }
         
+        for(TPosition position : positions) {
+            if (position == null) {
+                positions.remove(position);
+            }
+        }
+        
+        System.out.println("Positions size = " + positions.size());
+        System.out.println("Positions = " + positions);
+        
         Random rand = new Random();
-        int destinationIndex = rand.nextInt(positions.size());
-        destination = positions.get(destinationIndex);
+        while (true) {
+            int destinationIndex = rand.nextInt(positions.size());
+            System.out.println("Destination index = " + destinationIndex);
+            System.out.println("Destination test = " + positions.get(destinationIndex));
+            destination = positions.get(destinationIndex);
+            System.out.println("Destination = " + destination);
+            if (destination.getXx() >= 0 && destination.getXx() <= XLIMIT && 
+                destination.getYy() >= 0 && destination.getYy() <= YLIMIT) {
+                break;
+            }
+        }
         
         TMyPlace nextMyPlace = currentMyPlace;
         nextMyPlace.getPlace().get(0).setPosition(destination);
-        
+                
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
