@@ -383,10 +383,24 @@ public class Simulation extends Thread {
         places.remove(0); // center (0) treated different because isCow == true
         List<TPlace> neighbours = new ArrayList<>(places);
         
+        //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
+            // Stamina starts at 100
+            // Each movement spends 5 stamina
+            // Staying restores 10 stamina
+        
+        List<TPosition> wolvesPositions = neighbours.stream()
+                .filter(neighbour -> neighbour.isWolf())
+                .map(wolf -> wolf.getPosition())
+                .collect(Collectors.toList());
+
+        
+        //TODO: GET OPPOSITE SEX COWS POSITIONS FOR LATER BREEDING
+        
         List<TPosition> validPositions = neighbours.stream()
-                .filter(neighbour -> // borders, obstacles, empty grass and cows filtered out
+                .filter(neighbour -> // borders, obstacles, empty grass, wolves and cows filtered out
                         neighbour.getPosition() != null && !neighbour.isObstacle() 
-                                && neighbour.getGrass() > 0 && !neighbour.isCow()
+                                && neighbour.getGrass() > 0 && !neighbour.isWolf()
+                                && !neighbour.isCow()
                 ).map(validNeighbour -> validNeighbour.getPosition())
                 .collect(Collectors.toList());       
         
@@ -395,13 +409,32 @@ public class Simulation extends Thread {
         }
         
         if (validPositions.size() > 0) {    // if there is any valid position
-            Random rand = new Random();
-            int validPositionsIndex = rand.nextInt(validPositions.size());
-            TPosition nextPosition = validPositions.get(validPositionsIndex);
-
-            TMyPlace nextMyPlace = createMyPlace(nextPosition.getXx(), nextPosition.getYy());
+            if (wolvesPositions.size() > 0) {   // if wolves in neighbours choose valid position with max distance to wolves
+                double maxDistance = 0;
+                TPosition maxDistancePosition = null;
+                for (int i = 0; i < wolvesPositions.size(); i++) {
+                    for (int j = 0; j < validPositions.size(); j++) {
+                        double distance = distance(wolvesPositions.get(i), validPositions.get(j));
+                        if (distance > maxDistance) {
+                            maxDistance = distance;
+                            maxDistancePosition = validPositions.get(j);
+                        }
+                    }
+                }
             
-            return nextMyPlace;
+                if (maxDistancePosition != null) {  // if there is a valid position to avoid wolves
+                    return createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
+                }
+            } else {
+            
+                //TODO: IF NO WOLVES NEARBY, CHOOSE POSITION FOR BREEDING
+
+                Random rand = new Random();
+                int validPositionsIndex = rand.nextInt(validPositions.size());
+                TPosition nextPosition = validPositions.get(validPositionsIndex);
+
+                return createMyPlace(nextPosition.getXx(), nextPosition.getYy());
+            }
         }
         
         //TODO Lab 2:
@@ -420,6 +453,38 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the wolf directly in this method
         
+        List<TPlace> places = currentMyPlace.getPlace();
+        
+        //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
+            // Stamina starts at 100
+            // Each movement spends 1 stamina
+            // Staying restores 1 stamina
+            // Eating a cow restores 50 stamina
+        
+        //TODO: GET DOGS POSITIONS TO LATER RUN
+        
+        //TODO: GET COWS POSITIONS TO LATER CHASE
+        
+        List<TPosition> validPositions = places.stream()
+                .filter(place -> // borders, obstacles and wolves filtered out
+                        place.getPosition() != null && !place.isObstacle() && !place.isWolf()
+                ).map(validPlace -> validPlace.getPosition())
+                .collect(Collectors.toList());       
+        
+        if (validPositions.size() > 0) {    // if there is any valid position
+            // TODO: GET VALID POSITION FURTHEST AWAY FROM DOGS
+            
+            // TODO: GET VALID POSITION CLOSEST TO COWS
+            
+            Random rand = new Random();
+            int validPositionsIndex = rand.nextInt(validPositions.size());
+            TPosition nextPosition = validPositions.get(validPositionsIndex);
+
+            TMyPlace nextMyPlace = createMyPlace(nextPosition.getXx(), nextPosition.getYy());
+            
+            return nextMyPlace;
+        }
+        
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
@@ -429,6 +494,6 @@ public class Simulation extends Thread {
         //Deserilize result string to TMyPlace
         //return received TMyPlace
         
-        return null;
+        return currentMyPlace;
     }
 }
