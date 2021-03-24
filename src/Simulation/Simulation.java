@@ -13,9 +13,11 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.xml.bind.JAXBException;
 import org.netbeans.xml.schema.updateschema.TMyPlace;
 import org.netbeans.xml.schema.updateschema.TPlace;
@@ -26,9 +28,6 @@ import org.netbeans.xml.schema.updateschema.TPosition;
  * @author adroc
  */
 public class Simulation extends Thread {
-    
-    private static final int XLIMIT = 14;
-    private static final int YLIMIT = 14;
 
     private TPlace[][] myEnvironment;
     private EnvironmentGUI myGUI;
@@ -37,7 +36,7 @@ public class Simulation extends Thread {
     private int simulationSpeed;
 
     public Simulation(int Cows, int Wolfs, int Obstacles, int speed) {
-        myEnvironment = new TPlace[XLIMIT + 1][YLIMIT + 1];
+        myEnvironment = new TPlace[15][15];
         int obstacles = Obstacles;
         int wolfs = Wolfs;
         int cows = Cows;
@@ -367,30 +366,43 @@ public class Simulation extends Thread {
             }
         }
     }
+    
+    private double distance(TPosition a, TPosition b) {
+        return Math.sqrt(Math.pow(b.getXx() - a.getXx(), 2) + Math.pow(b.getYy() - a.getYy(), 2));
+    }
 
     private TMyPlace updateCowPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
         //TODO Lab 1:
         //Update the position of the cow directly in this method
-        ArrayList<TPosition> positions = new ArrayList<TPosition>();
-        for (TPlace place : currentMyPlace.getPlace()) {
-            if (!(place.isCow() || place.isWolf() || place.isObstacle() || place.getGrass() == 0)) {
-                positions.add(place.getPosition());
-            }
+        
+        // The cow looks for a random position around that is inside borders and 
+        // has grass, isn't an obstacle, cow or wolf
+        
+        List<TPlace> places = currentMyPlace.getPlace();
+        TPlace currentPlace = places.get(0);
+        places.remove(0); // center (0) treated different because isCow == true
+        List<TPlace> neighbours = new ArrayList<>(places);
+        
+        List<TPosition> validPositions = neighbours.stream()
+                .filter(neighbour -> // borders, obstacles, empty grass and cows filtered out
+                        neighbour.getPosition() != null && !neighbour.isObstacle() 
+                                && neighbour.getGrass() > 0 && !neighbour.isCow()
+                ).map(validNeighbour -> validNeighbour.getPosition())
+                .collect(Collectors.toList());       
+        
+        if (currentPlace.getGrass() > 0) {  // check if staying is valid
+            validPositions.add(currentPlace.getPosition());
         }
         
-        Random rand = new Random();
-        TPosition destination;
-        while (true) {
-            int destinationIndex = rand.nextInt(positions.size());
-            destination = positions.get(destinationIndex);
-            if (destination.getXx() >= 0 && destination.getXx() <= XLIMIT && 
-                destination.getYy() >= 0 && destination.getYy() <= YLIMIT) {
-                break;
-            }
+        if (validPositions.size() > 0) {    // if there is any valid position
+            Random rand = new Random();
+            int validPositionsIndex = rand.nextInt(validPositions.size());
+            TPosition nextPosition = validPositions.get(validPositionsIndex);
+
+            TMyPlace nextMyPlace = createMyPlace(nextPosition.getXx(), nextPosition.getYy());
+            
+            return nextMyPlace;
         }
-        
-        TMyPlace nextMyPlace = currentMyPlace;
-        nextMyPlace.getPlace().get(0).setPosition(destination);
         
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
@@ -401,53 +413,13 @@ public class Simulation extends Thread {
         //Deserilize result string to TMyPlace
         //return received TMyPlace
       
-        return nextMyPlace;
+        return currentMyPlace; // if the cow reaches this point, "Suicide is Badass"
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
         //TODO Lab 1:
-        //Update the position of the wolf directly in this 
-        TPosition destination = new TPosition();
-        ArrayList<TPosition> positions = new ArrayList<>();
-        for (TPlace place : currentMyPlace.getPlace()) {
-            if (place.isCow()) {
-                System.out.println("Found cow");
-                destination = place.getPosition();
-                
-                TMyPlace nextMyPlace = currentMyPlace;
-                nextMyPlace.getPlace().get(0).setPosition(destination);
-                
-                return nextMyPlace;
-            } else if (!(place.isWolf() || place.isObstacle())) {
-                positions.add(place.getPosition());
-            }
-        }
+        //Update the position of the wolf directly in this method
         
-        for(TPosition position : positions) {
-            if (position == null) {
-                positions.remove(position);
-            }
-        }
-        
-        System.out.println("Positions size = " + positions.size());
-        System.out.println("Positions = " + positions);
-        
-        Random rand = new Random();
-        while (true) {
-            int destinationIndex = rand.nextInt(positions.size());
-            System.out.println("Destination index = " + destinationIndex);
-            System.out.println("Destination test = " + positions.get(destinationIndex));
-            destination = positions.get(destinationIndex);
-            System.out.println("Destination = " + destination);
-            if (destination.getXx() >= 0 && destination.getXx() <= XLIMIT && 
-                destination.getYy() >= 0 && destination.getYy() <= YLIMIT) {
-                break;
-            }
-        }
-        
-        TMyPlace nextMyPlace = currentMyPlace;
-        nextMyPlace.getPlace().get(0).setPosition(destination);
-                
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
@@ -457,6 +429,6 @@ public class Simulation extends Thread {
         //Deserilize result string to TMyPlace
         //return received TMyPlace
         
-        return nextMyPlace;
+        return null;
     }
 }
