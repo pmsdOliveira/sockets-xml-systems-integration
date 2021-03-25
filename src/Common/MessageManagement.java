@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import org.netbeans.xml.schema.updateschema.ObjectFactory;
 import org.netbeans.xml.schema.updateschema.TMyPlace;
 
@@ -24,7 +25,7 @@ public class MessageManagement {
         //TODO Lab 2:
         //Serealize TMyPlace object to String using JAXB        
         JAXBContext context = JAXBContext.newInstance(myPlace.getClass());
-        JAXBElement<TMyPlace> element = new ObjectFactory().createTMyPlace(myPlace);
+        JAXBElement<TMyPlace> element = new ObjectFactory().createMyPlace(myPlace);
 
         Marshaller marshaller = context.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -32,7 +33,7 @@ public class MessageManagement {
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 
         StringWriter writer = new StringWriter();
-        marshaller.marshal(myPlace, writer);
+        marshaller.marshal(element, writer);
 
         return writer.toString();
     }
@@ -40,7 +41,10 @@ public class MessageManagement {
     public static TMyPlace retrievePlaceStateObject(String content) throws JAXBException {
         //TODO Lab 2:
         //Deserealize a String to a TMyPlace object using JAXB
+        JAXBContext context = JAXBContext.newInstance(TMyPlace.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        TMyPlace myPlace = (TMyPlace) unmarshaller.unmarshal(new StringReader(content));
 
-        return null;
+        return myPlace;
     }
 }

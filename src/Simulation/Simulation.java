@@ -438,13 +438,16 @@ public class Simulation extends Thread {
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
-        System.out.println("XML: " + MessageManagement.createPlaceStateContent(currentMyPlace));
+        String serialized = MessageManagement.createPlaceStateContent(nextMyPlace);
+        TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);       
         
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
         //call server socket to update cow position
         //Deserilize result string to TMyPlace
         //return received TMyPlace
+        
+        //Socket s = new Socket("localhost", 8080);
       
         return nextMyPlace; // if the cow reaches this point, "Suicide is Badass"
     }
