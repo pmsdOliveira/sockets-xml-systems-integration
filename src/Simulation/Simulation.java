@@ -370,6 +370,10 @@ public class Simulation extends Thread {
     private double distance(TPosition a, TPosition b) {
         return Math.sqrt(Math.pow(b.getXx() - a.getXx(), 2) + Math.pow(b.getYy() - a.getYy(), 2));
     }
+    
+    private TPosition randomTPositionFromList(List<TPosition> positions) {
+        return positions.get(new Random().nextInt(positions.size()));
+    }
 
     private TMyPlace updateCowPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
         //TODO Lab 1:
@@ -379,8 +383,7 @@ public class Simulation extends Thread {
         // If no wolves found, go to any valid positon (inside borders, has grass, no obstacle, cow or wolf)
         
         List<TPlace> places = currentMyPlace.getPlace();
-        TPlace currentPlace = places.get(0);
-        places.remove(0); // center (0) treated different because isCow == true
+        TPlace currentPlace = places.remove(0); // center (0) treated different because isCow == true
         List<TPlace> neighbours = new ArrayList<>(places);
         
         //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
@@ -421,8 +424,6 @@ public class Simulation extends Thread {
                         }
                     }
                 }
-            
-                
                 
                 if (maxDistancePosition != null) {  // if there is a valid position to avoid wolves
                     return createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
@@ -430,11 +431,8 @@ public class Simulation extends Thread {
             } else {
                 //TODO: IF NO WOLVES NEARBY, CHOOSE POSITION FOR BREEDING
 
-                Random rand = new Random();
-                int validPositionsIndex = rand.nextInt(validPositions.size());
-                TPosition nextPosition = validPositions.get(validPositionsIndex);
-
-                return createMyPlace(nextPosition.getXx(), nextPosition.getYy());
+                TPosition selectedValidPosition = randomTPositionFromList(validPositions);
+                return createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
             }
         }
         
@@ -458,7 +456,6 @@ public class Simulation extends Thread {
         // If no cows found, go to a random valid position (inside borders, no obstacle or wolf)
         
         List<TPlace> places = currentMyPlace.getPlace();
-        TPosition myPosition = places.get(0).getPosition();
         
         //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
             // Stamina starts at 100
@@ -468,7 +465,6 @@ public class Simulation extends Thread {
         
         //TODO: GET DOGS POSITIONS TO LATER RUN
         
-        //TODO: GET COWS POSITIONS TO LATER CHASE
         List<TPosition> cowsPositions = places.stream()
                 .filter(place -> place.isCow())
                 .map(cow -> cow.getPosition())
@@ -480,32 +476,15 @@ public class Simulation extends Thread {
                 ).map(validPlace -> validPlace.getPosition())
                 .collect(Collectors.toList());       
         
-        if (validPositions.size() > 0) {    // if there is any valid position
-            
+        if (validPositions.size() > 0) {    // if there is any valid position  
             // TODO: GET VALID POSITION FURTHEST AWAY FROM DOGS
             
-            if (cowsPositions.size() > 0) { // choose valid position closest to cows
-                double minDistance = 3;
-                TPosition minDistancePosition = null;
-                for (TPosition cowPosition : cowsPositions) {
-                    double distance = distance(myPosition, cowPosition);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        minDistancePosition = cowPosition;
-                    }
-                }
-            
-                if (minDistancePosition != null) {  // if there is a valid position to chase cows
-                    return createMyPlace(minDistancePosition.getXx(), minDistancePosition.getYy());
-                }
+            if (cowsPositions.size() > 0) { // choose random cow and move to it
+                TPosition selectedCowPosition = randomTPositionFromList(cowsPositions);
+                return createMyPlace(selectedCowPosition.getXx(), selectedCowPosition.getYy());
             } else { // no cows found
-                Random rand = new Random();
-                int validPositionsIndex = rand.nextInt(validPositions.size());
-                TPosition nextPosition = validPositions.get(validPositionsIndex);
-
-                TMyPlace nextMyPlace = createMyPlace(nextPosition.getXx(), nextPosition.getYy());
-
-                return nextMyPlace;
+                TPosition selectedValidPosition = randomTPositionFromList(validPositions);
+                return createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
             }
         }
         
