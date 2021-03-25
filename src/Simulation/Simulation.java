@@ -367,10 +367,6 @@ public class Simulation extends Thread {
         }
     }
     
-    private double distance(TPosition a, TPosition b) {
-        return Math.sqrt(Math.pow(b.getXx() - a.getXx(), 2) + Math.pow(b.getYy() - a.getYy(), 2));
-    }
-    
     private TPosition randomTPositionFromList(List<TPosition> positions) {
         return positions.get(new Random().nextInt(positions.size()));
     }
@@ -378,9 +374,6 @@ public class Simulation extends Thread {
     private TMyPlace updateCowPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
         //TODO Lab 1:
         //Update the position of the cow directly in this method
-        
-        // Cow looks for wolves and tries to get to the valid position furthest away from them
-        // If no wolves found, go to any valid positon (inside borders, has grass, no obstacle, cow or wolf)
         
         List<TPlace> places = currentMyPlace.getPlace();
         TPlace currentPlace = places.remove(0); // center (0) treated different because isCow == true
@@ -390,12 +383,6 @@ public class Simulation extends Thread {
             // Stamina starts at 100
             // Each movement spends 5 stamina
             // Staying restores 10 stamina
-        
-        List<TPosition> wolvesPositions = neighbours.stream()
-                .filter(neighbour -> neighbour.isWolf())
-                .map(wolf -> wolf.getPosition())
-                .collect(Collectors.toList());
-
         
         //TODO: GET OPPOSITE SEX COWS POSITIONS FOR LATER BREEDING
         
@@ -412,28 +399,10 @@ public class Simulation extends Thread {
         }
         
         if (validPositions.size() > 0) {    // if there is any valid position
-            if (wolvesPositions.size() > 0) {   // if wolves in neighbours choose valid position with max distance to wolves
-                double maxDistance = 0;
-                TPosition maxDistancePosition = null;
-                for (TPosition wolfPosition : wolvesPositions) {
-                    for (TPosition validPosition : validPositions) {
-                        double distance = distance(wolfPosition, validPosition);
-                        if (distance > maxDistance) {
-                            maxDistance = distance;
-                            maxDistancePosition = validPosition;
-                        }
-                    }
-                }
-                
-                if (maxDistancePosition != null) {  // if there is a valid position to avoid wolves
-                    return createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
-                }
-            } else {
-                //TODO: IF NO WOLVES NEARBY, CHOOSE POSITION FOR BREEDING
+            //TODO: CHOOSE POSITION FOR BREEDING
 
-                TPosition selectedValidPosition = randomTPositionFromList(validPositions);
-                return createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
-            }
+            TPosition selectedValidPosition = randomTPositionFromList(validPositions);
+            return createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
         }
         
         //TODO Lab 2:
