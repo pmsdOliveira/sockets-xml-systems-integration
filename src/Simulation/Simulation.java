@@ -379,6 +379,8 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the cow directly in this method
         
+        TMyPlace nextMyPlace = currentMyPlace;
+        
         List<TPlace> places = currentMyPlace.getPlace();
         TPlace currentPlace = places.remove(0); // center (0) treated different because isCow == true
         List<TPlace> neighbours = new ArrayList<>(places);
@@ -426,15 +428,17 @@ public class Simulation extends Thread {
                     }
                 }
                 
-                return createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
+                nextMyPlace = createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
             } else {
                 TPosition selectedValidPosition = randomTPositionFromList(validPositions);
-                return createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
+                nextMyPlace = createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
             }
         }
         
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
+        
+        System.out.println("XML: " + MessageManagement.createPlaceStateContent(currentMyPlace));
         
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
@@ -442,7 +446,7 @@ public class Simulation extends Thread {
         //Deserilize result string to TMyPlace
         //return received TMyPlace
       
-        return currentMyPlace; // if the cow reaches this point, "Suicide is Badass"
+        return nextMyPlace; // if the cow reaches this point, "Suicide is Badass"
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
