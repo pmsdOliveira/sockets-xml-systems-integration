@@ -375,8 +375,8 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the cow directly in this method
         
-        // The cow looks for a random position around that is inside borders and 
-        // has grass, isn't an obstacle, cow or wolf
+        // Cow looks for wolves and tries to get to the valid position furthest away from them
+        // If no wolves found, go to any valid positon (inside borders, has grass, no obstacle, cow or wolf)
         
         List<TPlace> places = currentMyPlace.getPlace();
         TPlace currentPlace = places.get(0);
@@ -412,21 +412,22 @@ public class Simulation extends Thread {
             if (wolvesPositions.size() > 0) {   // if wolves in neighbours choose valid position with max distance to wolves
                 double maxDistance = 0;
                 TPosition maxDistancePosition = null;
-                for (int i = 0; i < wolvesPositions.size(); i++) {
-                    for (int j = 0; j < validPositions.size(); j++) {
-                        double distance = distance(wolvesPositions.get(i), validPositions.get(j));
+                for (TPosition wolfPosition : wolvesPositions) {
+                    for (TPosition validPosition : validPositions) {
+                        double distance = distance(wolfPosition, validPosition);
                         if (distance > maxDistance) {
                             maxDistance = distance;
-                            maxDistancePosition = validPositions.get(j);
+                            maxDistancePosition = validPosition;
                         }
                     }
                 }
             
+                
+                
                 if (maxDistancePosition != null) {  // if there is a valid position to avoid wolves
                     return createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
                 }
             } else {
-            
                 //TODO: IF NO WOLVES NEARBY, CHOOSE POSITION FOR BREEDING
 
                 Random rand = new Random();
@@ -453,7 +454,11 @@ public class Simulation extends Thread {
         //TODO Lab 1:
         //Update the position of the wolf directly in this method
         
+        // Wolf looks for cows. If found, chooses the closest valid position
+        // If no cows found, go to a random valid position (inside borders, no obstacle or wolf)
+        
         List<TPlace> places = currentMyPlace.getPlace();
+        TPosition myPosition = places.get(0).getPosition();
         
         //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
             // Stamina starts at 100
@@ -464,6 +469,10 @@ public class Simulation extends Thread {
         //TODO: GET DOGS POSITIONS TO LATER RUN
         
         //TODO: GET COWS POSITIONS TO LATER CHASE
+        List<TPosition> cowsPositions = places.stream()
+                .filter(place -> place.isCow())
+                .map(cow -> cow.getPosition())
+                .collect(Collectors.toList());
         
         List<TPosition> validPositions = places.stream()
                 .filter(place -> // borders, obstacles and wolves filtered out
@@ -472,17 +481,32 @@ public class Simulation extends Thread {
                 .collect(Collectors.toList());       
         
         if (validPositions.size() > 0) {    // if there is any valid position
+            
             // TODO: GET VALID POSITION FURTHEST AWAY FROM DOGS
             
-            // TODO: GET VALID POSITION CLOSEST TO COWS
+            if (cowsPositions.size() > 0) { // choose valid position closest to cows
+                double minDistance = 3;
+                TPosition minDistancePosition = null;
+                for (TPosition cowPosition : cowsPositions) {
+                    double distance = distance(myPosition, cowPosition);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        minDistancePosition = cowPosition;
+                    }
+                }
             
-            Random rand = new Random();
-            int validPositionsIndex = rand.nextInt(validPositions.size());
-            TPosition nextPosition = validPositions.get(validPositionsIndex);
+                if (minDistancePosition != null) {  // if there is a valid position to chase cows
+                    return createMyPlace(minDistancePosition.getXx(), minDistancePosition.getYy());
+                }
+            } else { // no cows found
+                Random rand = new Random();
+                int validPositionsIndex = rand.nextInt(validPositions.size());
+                TPosition nextPosition = validPositions.get(validPositionsIndex);
 
-            TMyPlace nextMyPlace = createMyPlace(nextPosition.getXx(), nextPosition.getYy());
-            
-            return nextMyPlace;
+                TMyPlace nextMyPlace = createMyPlace(nextPosition.getXx(), nextPosition.getYy());
+
+                return nextMyPlace;
+            }
         }
         
         //TODO Lab 2:
