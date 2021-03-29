@@ -386,82 +386,26 @@ public class Simulation extends Thread {
     }
 
     private TMyPlace updateCowPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
-        //TODO Lab 1:
-        //Update the position of the cow directly in this method
-        
-        TMyPlace nextMyPlace = currentMyPlace;
-        
-        List<TPlace> places = currentMyPlace.getPlace();
-        TPlace currentPlace = places.remove(0); // center (0) treated different because isCow == true
-        List<TPlace> neighbours = new ArrayList<>(places);
-        
-        //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
-            // Stamina starts at 100
-            // Each movement spends 5 stamina
-            // Staying restores 10 stamina
-        
-        //TODO: GET OPPOSITE SEX COWS POSITIONS FOR LATER BREEDING
-        
-        List<TPosition> wolvesPositions = neighbours.stream()
-                .filter(neighbour -> neighbour.isWolf())
-                .map(validNeighbour -> validNeighbour.getPosition())
-                .collect(Collectors.toList());
-        
-        List<TPosition> validPositions = neighbours.stream()
-                .filter(neighbour -> // borders, obstacles, empty grass, wolves and cows filtered out
-                        neighbour.getPosition() != null && !neighbour.isObstacle() 
-                                && neighbour.getGrass() > 0 && !neighbour.isWolf()
-                                && !neighbour.isCow()
-                ).map(validNeighbour -> validNeighbour.getPosition())
-                .collect(Collectors.toList());       
-        
-        if (currentPlace.getGrass() > 0) {  // check if staying is valid
-            validPositions.add(currentPlace.getPosition());
-        }
-        
-        if (validPositions.size() > 0) {    // if there is any valid position
-            //TODO: CHOOSE POSITION FOR BREEDING
-
-            double maxDistance = 0;
-            TPosition maxDistancePosition = new TPosition();
-            if (wolvesPositions.size() > 0) {
-                for (TPosition validPosition : validPositions) {
-                    double distance = 0;
-                    for (TPosition wolfPosition : wolvesPositions) {
-                        distance += cityBlock(validPosition, wolfPosition);
-                    }
-                    
-                    double averageDistance = distance / wolvesPositions.size();
-                    if (averageDistance > maxDistance) {
-                        maxDistance = averageDistance;
-                        maxDistancePosition = validPosition;
-                    }
-                }
-                
-                nextMyPlace = createMyPlace(maxDistancePosition.getXx(), maxDistancePosition.getYy());
-            } else {
-                TPosition selectedValidPosition = randomTPositionFromList(validPositions);
-                nextMyPlace = createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
-            }
-        }
-        
-        //TODO Lab 2:
+        //Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
-        
-        String serialized = MessageManagement.createPlaceStateContent(nextMyPlace);
-        //TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);       
+        // String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        // TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);
         
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
+        String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         //call server socket to update cow position
         output.println(serialized);
         
-        //Deserilize result string to TMyPlace
-        //return received TMyPlace
+        //Read content received from client (Simulation)
+        BufferedReader received = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
         
-        //Socket s = new Socket("localhost", 8080);
-      
-        return nextMyPlace; // if the cow reaches this point, "Suicide is Badass"
+        String line, message = "";
+        while (!(line = received.readLine()).equals(""))
+            message += line;
+        
+        //Deserilize result string to TMyPlace and return it
+        return MessageManagement.retrievePlaceStateObject(message);
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
