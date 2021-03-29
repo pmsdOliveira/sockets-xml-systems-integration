@@ -29,15 +29,16 @@ import org.netbeans.xml.schema.updateschema.TPosition;
  */
 public class Simulation extends Thread {
     
-    private static final int portServer = 4444;
+    private static final int cowPort = 4444;
+    private static final int wolfPort = 4445;
 
     private TPlace[][] myEnvironment;
     private EnvironmentGUI myGUI;
     private HashMap<String, TPosition> wolfList = new HashMap<>();
     private HashMap<String, TPosition> cowList = new HashMap<>();
     private int simulationSpeed;
-    private Socket cowSocket;
-    private PrintStream output;
+    private Socket cowSocket, wolfSocket;
+    private PrintStream cowSocketOutput, wolfSocketOutput;
 
     public Simulation(int Cows, int Wolfs, int Obstacles, int speed) {
         myEnvironment = new TPlace[15][15];
@@ -47,8 +48,10 @@ public class Simulation extends Thread {
         simulationSpeed = speed;
         
         try {
-            cowSocket = new Socket("localhost", portServer);
-            output = new PrintStream(cowSocket.getOutputStream(), true);
+            cowSocket = new Socket("localhost", cowPort);
+            wolfSocket = new Socket("localhost", wolfPort);
+            cowSocketOutput = new PrintStream(cowSocket.getOutputStream(), true);
+            wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream(), true);
         } catch (Exception e) {}
         
         generateEnvironment(obstacles, wolfs, cows);
@@ -395,7 +398,7 @@ public class Simulation extends Thread {
         //Serialize TMyPlace object to string
         String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         //call server socket to update cow position
-        output.println(serialized);
+        cowSocketOutput.println(serialized);
         
         //Read content received from client (Simulation)
         BufferedReader received = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
@@ -409,49 +412,26 @@ public class Simulation extends Thread {
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
-        //TODO Lab 1:
-        //Update the position of the wolf directly in this method
-        
-        // Wolf looks for cows. If found, chooses the closest valid position
-        // If no cows found, go to a random valid position (inside borders, no obstacle or wolf)
-        
-        List<TPlace> places = currentMyPlace.getPlace();       
-        
-        //TODO: IMPLEMENT A STAMINA SYSTEM, EXAMPLE:
-            // Stamina starts at 100
-            // Each movement spends 1 stamina
-            // Staying restores 1 stamina
-            // Eating a cow restores 50 stamina
-        
-        //TODO: GET DOGS POSITIONS TO LATER RUN
-        
-        List<TPosition> cowsPositions = places.stream()
-                .filter(place -> place.isCow())
-                .map(cow -> cow.getPosition())
-                .collect(Collectors.toList());
-        
-        if (cowsPositions.size() > 0) { // choose random cow and move to it
-            TPosition selectedCowPosition = randomTPositionFromList(cowsPositions);
-            return createMyPlace(selectedCowPosition.getXx(), selectedCowPosition.getYy());
-        }
-        
-        List<TPosition> validPositions = places.stream()
-                .filter(place -> // borders, obstacles and wolves filtered out
-                        place.getPosition() != null && !place.isObstacle() && !place.isWolf()
-                ).map(validPlace -> validPlace.getPosition())
-                .collect(Collectors.toList());
-        validPositions.add(places.get(0).getPosition());
-
-        TPosition selectedValidPosition = randomTPositionFromList(validPositions);
-        return createMyPlace(selectedValidPosition.getXx(), selectedValidPosition.getYy());
-        
         //TODO Lab 2:
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
+        // String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        // TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);
+        
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
-        //call server socket to update wolf position
-        //Deserilize result string to TMyPlace
-        //return received TMyPlace
+        String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        //call server socket to update cow position
+        wolfSocketOutput.println(serialized);
+        
+        //Read content received from client (Simulation)
+        BufferedReader received = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
+        
+        String line, message = "";
+        while (!(line = received.readLine()).equals(""))
+            message += line;
+        
+        //Deserilize result string to TMyPlace and return it
+        return MessageManagement.retrievePlaceStateObject(message);
     }
 }
