@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="file:/C:/Users/adroc/Documents/NetBeansProjects/IS_TP1_Sockets/src/XML/myPlaceSchema.xml" uri="xml-resources/jaxb/myPlace/myPlaceSchema.xml.xsd"/>
+</catalog>
