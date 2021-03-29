@@ -28,12 +28,16 @@ import org.netbeans.xml.schema.updateschema.TPosition;
  * @author adroc
  */
 public class Simulation extends Thread {
+    
+    private static final int portServer = 4444;
 
     private TPlace[][] myEnvironment;
     private EnvironmentGUI myGUI;
     private HashMap<String, TPosition> wolfList = new HashMap<>();
     private HashMap<String, TPosition> cowList = new HashMap<>();
     private int simulationSpeed;
+    private Socket cowSocket;
+    private PrintStream output;
 
     public Simulation(int Cows, int Wolfs, int Obstacles, int speed) {
         myEnvironment = new TPlace[15][15];
@@ -41,6 +45,12 @@ public class Simulation extends Thread {
         int wolfs = Wolfs;
         int cows = Cows;
         simulationSpeed = speed;
+        
+        try {
+            cowSocket = new Socket("localhost", portServer);
+            output = new PrintStream(cowSocket.getOutputStream(), true);
+        } catch (Exception e) {}
+        
         generateEnvironment(obstacles, wolfs, cows);
         /*
              * Start GUI
@@ -439,11 +449,13 @@ public class Simulation extends Thread {
         //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
         
         String serialized = MessageManagement.createPlaceStateContent(nextMyPlace);
-        TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);       
+        //TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);       
         
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
         //call server socket to update cow position
+        output.println(serialized);
+        
         //Deserilize result string to TMyPlace
         //return received TMyPlace
         
