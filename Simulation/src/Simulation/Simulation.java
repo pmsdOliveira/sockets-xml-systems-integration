@@ -13,11 +13,9 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.xml.bind.JAXBException;
 import org.netbeans.xml.schema.updateschema.TMyPlace;
 import org.netbeans.xml.schema.updateschema.TPlace;
@@ -37,8 +35,8 @@ public class Simulation extends Thread {
     private HashMap<String, TPosition> wolfList = new HashMap<>();
     private HashMap<String, TPosition> cowList = new HashMap<>();
     private int simulationSpeed;
-    private Socket cowSocket, wolfSocket;
-    private PrintStream cowSocketOutput, wolfSocketOutput;
+    private static Socket cowSocket, wolfSocket;
+    private static PrintStream cowSocketOutput, wolfSocketOutput;
 
     public Simulation(int Cows, int Wolfs, int Obstacles, int speed) {
         myEnvironment = new TPlace[15][15];
@@ -50,9 +48,11 @@ public class Simulation extends Thread {
         try {
             cowSocket = new Socket("localhost", cowPort);
             wolfSocket = new Socket("localhost", wolfPort);
-            cowSocketOutput = new PrintStream(cowSocket.getOutputStream(), true);
-            wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream(), true);
-        } catch (Exception e) {}
+            cowSocketOutput = new PrintStream(cowSocket.getOutputStream());
+            wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
+        } catch (Exception e) {
+            System.err.println(e.toString());
+        }
         
         generateEnvironment(obstacles, wolfs, cows);
         /*
@@ -379,14 +379,6 @@ public class Simulation extends Thread {
             }
         }
     }
-    
-    private double cityBlock(TPosition a, TPosition b) {
-        return Math.abs(a.getXx() - b.getXx()) + Math.abs(a.getYy() - b.getYy());
-    }
-    
-    private TPosition randomTPositionFromList(List<TPosition> positions) {
-        return positions.get(new Random().nextInt(positions.size()));
-    }
 
     private TMyPlace updateCowPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
         //Lab 2:
@@ -396,19 +388,24 @@ public class Simulation extends Thread {
         
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
-        String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        // String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         //call server socket to update cow position
-        cowSocketOutput.println(serialized);
+        // cowSocketOutput.println(serialized);
+        System.out.println(cowSocket);
         
+        //cowSocketOutput.println("SIMULATION INSIDE ANOTHER SIMULATION </tMyPlace>");
         //Read content received from client (Simulation)
-        BufferedReader received = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
+        //BufferedReader received = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
         
-        String line, message = "";
-        while (!(line = received.readLine()).equals(""))
-            message += line;
+//        String line, message = "";
+//        while (!(line = received.readLine()).equals(""))
+//            message += line;
+        //String message = received.readLine();
+        //System.out.println(message);
         
         //Deserilize result string to TMyPlace and return it
-        return MessageManagement.retrievePlaceStateObject(message);
+        //return MessageManagement.retrievePlaceStateObject(message);
+        return currentMyPlace;
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
