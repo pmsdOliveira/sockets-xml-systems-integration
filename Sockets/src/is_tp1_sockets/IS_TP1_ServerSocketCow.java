@@ -83,7 +83,7 @@ public class IS_TP1_ServerSocketCow {
 
             List<TPosition> wolvesPositions = neighbours.stream()
                     .filter(neighbour -> neighbour.isWolf())
-                    .map(validNeighbour -> validNeighbour.getPosition())
+                    .map(wolf -> wolf.getPosition())
                     .collect(Collectors.toList());
 
             List<TPosition> validPositions = neighbours.stream()
@@ -101,9 +101,9 @@ public class IS_TP1_ServerSocketCow {
             if (validPositions.size() > 0) {    // if there is any valid position
                 //TODO: CHOOSE POSITION FOR BREEDING
 
-                double maxDistance = 0;
-                TPosition maxDistancePosition = new TPosition();
                 if (wolvesPositions.size() > 0) {
+                    double maxDistance = 0;
+                    TPosition maxDistancePosition = new TPosition();
                     for (TPosition validPosition : validPositions) {
                         double distance = 0;
                         for (TPosition wolfPosition : wolvesPositions) {

@@ -1,0 +1,13 @@
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.exe
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.deps.json
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.runtimeconfig.json
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.runtimeconfig.dev.json
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.dll
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.pdb
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.csprojAssemblyReference.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.AssemblyInfoInputs.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.AssemblyInfo.cs
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.dll
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.pdb
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketCow\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketCow.genruntimeconfig.cache

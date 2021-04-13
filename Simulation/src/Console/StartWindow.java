@@ -6,6 +6,7 @@
 package Console;
 
 import Simulation.Simulation;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 
 /**
@@ -134,12 +135,16 @@ public class StartWindow extends javax.swing.JFrame {
                 Integer.parseInt(jSpinnerObstacles.getValue().toString())) > 225){
             JOptionPane.showMessageDialog(this, "Too Many Pieces in the Simulation!!!,\nPlease Choose Less Than 225");
         } else {
-            Simulation myEnvironment = new Simulation(Integer.parseInt(jSpinnerCows.getValue().toString()),
-                    Integer.parseInt(jSpinnerWolfs.getValue().toString()),
-                    Integer.parseInt(jSpinnerObstacles.getValue().toString()),
-                    jSlider1.getValue());
-            myEnvironment.start();
-            this.setVisible(false);
+            try {
+                Simulation myEnvironment = new Simulation(Integer.parseInt(jSpinnerCows.getValue().toString()),
+                        Integer.parseInt(jSpinnerWolfs.getValue().toString()),
+                        Integer.parseInt(jSpinnerObstacles.getValue().toString()),
+                        jSlider1.getValue());
+                myEnvironment.start();
+                this.setVisible(false);
+            } catch (IOException e) {
+                System.err.println(e.toString());
+            }
         }
     }//GEN-LAST:event_jButtonStartActionPerformed
 

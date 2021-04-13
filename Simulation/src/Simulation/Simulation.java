@@ -35,10 +35,11 @@ public class Simulation extends Thread {
     private HashMap<String, TPosition> wolfList = new HashMap<>();
     private HashMap<String, TPosition> cowList = new HashMap<>();
     private int simulationSpeed;
-    private static Socket cowSocket, wolfSocket;
-    private static PrintStream cowSocketOutput, wolfSocketOutput;
+    private Socket cowSocket, wolfSocket;
+    private PrintStream cowSocketOutput, wolfSocketOutput;
+    private BufferedReader cowSocketInput, wolfSocketInput;
 
-    public Simulation(int Cows, int Wolfs, int Obstacles, int speed) {
+    public Simulation(int Cows, int Wolfs, int Obstacles, int speed) throws IOException {
         myEnvironment = new TPlace[15][15];
         int obstacles = Obstacles;
         int wolfs = Wolfs;
@@ -47,12 +48,16 @@ public class Simulation extends Thread {
         
         try {
             cowSocket = new Socket("localhost", cowPort);
-            wolfSocket = new Socket("localhost", wolfPort);
+            //wolfSocket = new Socket("localhost", wolfPort);
             cowSocketOutput = new PrintStream(cowSocket.getOutputStream());
-            wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
+            //wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
+            cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
+            //wolfSocketInput = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
         } catch (Exception e) {
             System.err.println(e.toString());
         }
+        
+        
         
         generateEnvironment(obstacles, wolfs, cows);
         /*
@@ -388,20 +393,16 @@ public class Simulation extends Thread {
         
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
-        // String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         //call server socket to update cow position
-        // cowSocketOutput.println(serialized);
-        System.out.println(cowSocket);
+        cowSocketOutput.println(serialized);
         
-        //cowSocketOutput.println("SIMULATION INSIDE ANOTHER SIMULATION </tMyPlace>");
-        //Read content received from client (Simulation)
-        //BufferedReader received = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
-        
-//        String line, message = "";
-//        while (!(line = received.readLine()).equals(""))
-//            message += line;
-        //String message = received.readLine();
-        //System.out.println(message);
+        //Read content received from client (Simulation)       
+        String line, message = "";
+        while (!(line = cowSocketInput.readLine()).equals(""))
+           message += line;
+        //String message = cowSocketInput.readLine();
+        System.out.println(message);
         
         //Deserilize result string to TMyPlace and return it
         //return MessageManagement.retrievePlaceStateObject(message);
@@ -419,16 +420,15 @@ public class Simulation extends Thread {
         //Serialize TMyPlace object to string
         String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         //call server socket to update cow position
-        wolfSocketOutput.println(serialized);
+        //wolfSocketOutput.println(serialized);
         
-        //Read content received from client (Simulation)
-        BufferedReader received = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
-        
-        String line, message = "";
-        while (!(line = received.readLine()).equals(""))
-            message += line;
+        //Read content received from client (Simulation)      
+        //String line, message = "";
+        //while (!(line = wolfSocketInput.readLine()).equals(""))
+        //    message += line;
         
         //Deserilize result string to TMyPlace and return it
-        return MessageManagement.retrievePlaceStateObject(message);
+        //return MessageManagement.retrievePlaceStateObject(message);
+        return currentMyPlace;
     }
 }
