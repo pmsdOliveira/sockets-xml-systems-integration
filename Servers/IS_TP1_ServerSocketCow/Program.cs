@@ -82,28 +82,23 @@ namespace IS_TP1_ServerSocketCow
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, portServer);
 
             // TCP socket
-            Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
                 // Bind socket to local endpoint
-                socket.Bind(localEndPoint);
+                listener.Bind(localEndPoint);
 
                 // Enable listening for incoming connections
-                socket.Listen(10);
-                Console.WriteLine("Server open on port 4444");
-
-                Console.WriteLine("Waiting for connection");
-                // Blocks while waiting for connection
-                Socket handler = socket.Accept();
-
-                // Process incoming connection
-                Console.WriteLine("Connection established");
+                listener.Listen(10);
 
                 // For each incoming connection
                 while (true)
                 {
+                    // Blocks while waiting for connection
+                    Socket handler = listener.Accept();
                     string data = null;
+
                     while (true)
                     {
                         int bytesRec = handler.Receive(bytes);
@@ -112,12 +107,10 @@ namespace IS_TP1_ServerSocketCow
                             break;
                     }
 
-                    Console.WriteLine("Received: {0}", data);
+                    Console.WriteLine("Received:\n{0}\n", data);
 
                     tMyPlace currentMyPlace = (tMyPlace)serializer.Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(data)));
                     tMyPlace nextMyPlace = updateCowPosition(currentMyPlace);
-
-                    handler.Send(Encoding.ASCII.GetBytes("Entao bom dia\nseus conas\nde sabao"));
 
                     string send = "";
                     using (MemoryStream stream = new MemoryStream())
@@ -126,7 +119,9 @@ namespace IS_TP1_ServerSocketCow
                         send = Encoding.ASCII.GetString(stream.ToArray());
                     }
 
-                    Console.WriteLine("Sending: " + send);
+                    Console.WriteLine("Sending:\n{0}\n", send);
+                    handler.Shutdown(SocketShutdown.Both);
+                    handler.Close();
                 }
             }
             catch (Exception e)

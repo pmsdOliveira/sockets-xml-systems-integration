@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -398,13 +399,13 @@ public class Simulation extends Thread {
         //call server socket to update cow position
         cowSocketOutput.println(serialized);
         
-        //Read content received from client (Simulation)   
-        String line, message = "";
+        //Read content received from client (Simulation)
+        String line, data = "";
         do {
             line = cowSocketInput.readLine();
-            message += line;
-        } while (!line.equals(""));
-        System.out.println(message);
+            data += line;
+        } while (!line.contains("</MyPlace>"));
+        System.out.println("Received:\n" + data);
         
         //Deserilize result string to TMyPlace and return it
         //return MessageManagement.retrievePlaceStateObject(message);
