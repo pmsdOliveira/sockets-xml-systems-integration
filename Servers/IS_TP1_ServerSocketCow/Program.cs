@@ -93,37 +93,40 @@ namespace IS_TP1_ServerSocketCow
                 socket.Listen(10);
                 Console.WriteLine("Server open on port 4444");
 
+                Console.WriteLine("Waiting for connection");
+                // Blocks while waiting for connection
+                Socket handler = socket.Accept();
+
+                // Process incoming connection
+                Console.WriteLine("Connection established");
+
                 // For each incoming connection
                 while (true)
                 {
-                    Console.WriteLine("Waiting for connection");
-                    // Blocks while waiting for connection
-                    Socket handler = socket.Accept();
                     string data = null;
-
-                    // Process incoming connection
                     while (true)
                     {
-                        //Console.WriteLine("STUCK");
                         int bytesRec = handler.Receive(bytes);
                         data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
                         if (data.IndexOf("</MyPlace>") > -1)
-                        {
                             break;
-                        }
                     }
 
-                    //Console.WriteLine("Text received: {0}", data);
+                    Console.WriteLine("Received: {0}", data);
 
-                    tMyPlace currentMyPlace = (tMyPlace) serializer.Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(data)));
+                    tMyPlace currentMyPlace = (tMyPlace)serializer.Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(data)));
                     tMyPlace nextMyPlace = updateCowPosition(currentMyPlace);
 
-                    NetworkStream outputStream = new NetworkStream(handler);
-                    serializer.Serialize(outputStream, nextMyPlace);
-                    
-                    handler.Send(Encoding.ASCII.GetBytes("COW ANSWER"));
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
+                    handler.Send(Encoding.ASCII.GetBytes("Entao bom dia\nseus conas\nde sabao"));
+
+                    string send = "";
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        serializer.Serialize(stream, nextMyPlace);
+                        send = Encoding.ASCII.GetString(stream.ToArray());
+                    }
+
+                    Console.WriteLine("Sending: " + send);
                 }
             }
             catch (Exception e)

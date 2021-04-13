@@ -394,14 +394,16 @@ public class Simulation extends Thread {
         //TODO Lab 3 & 4:
         //Serialize TMyPlace object to string
         String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        
         //call server socket to update cow position
         cowSocketOutput.println(serialized);
         
-        //Read content received from client (Simulation)       
+        //Read content received from client (Simulation)   
         String line, message = "";
-        while (!(line = cowSocketInput.readLine()).equals(""))
-           message += line;
-        //String message = cowSocketInput.readLine();
+        do {
+            line = cowSocketInput.readLine();
+            message += line;
+        } while (!line.equals(""));
         System.out.println(message);
         
         //Deserilize result string to TMyPlace and return it
