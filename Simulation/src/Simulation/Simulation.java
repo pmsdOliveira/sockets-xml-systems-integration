@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -51,6 +50,7 @@ public class Simulation extends Thread {
             cowSocket = new Socket("localhost", cowPort);
             //wolfSocket = new Socket("localhost", wolfPort);
             cowSocketOutput = new PrintStream(cowSocket.getOutputStream());
+            cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
             //wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
             //wolfSocketInput = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
         } catch (Exception e) {
@@ -395,26 +395,14 @@ public class Simulation extends Thread {
         //Serialize TMyPlace object to string
         String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         
-        System.out.println("Client sending:\n" + serialized + "\n");
-        
         //call server socket to update cow position
         cowSocketOutput.println(serialized);
         
-        cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
-        
-        // if 1024 it gives error
-        char[] buffer = new char[2048];
-        String message = "";
-        while (true) {
-            cowSocketInput.read(buffer);
-            message += new String(buffer); 
-            if (message.contains("</MyPlace>"))
-                break;
-        }
-        System.out.println("Client received:\n" + message.trim() + "...");
+        //Read content received from server (Cow Socket)
+        String received = cowSocketInput.readLine().trim();
+
         //Deserilize result string to TMyPlace and return it
-        return MessageManagement.retrievePlaceStateObject(message.trim());
-        //return currentMyPlace;
+        return MessageManagement.retrievePlaceStateObject(received);
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
