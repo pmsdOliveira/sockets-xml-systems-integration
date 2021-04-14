@@ -8,7 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace IS_TP1_ServerSocketCow
+namespace IS_TP1_ServerSocketwolf
 {
     class Program
     {
