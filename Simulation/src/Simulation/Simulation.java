@@ -52,7 +52,6 @@ public class Simulation extends Thread {
             //wolfSocket = new Socket("localhost", wolfPort);
             cowSocketOutput = new PrintStream(cowSocket.getOutputStream());
             //wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
-            cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
             //wolfSocketInput = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
         } catch (Exception e) {
             System.err.println(e.toString());
@@ -396,20 +395,26 @@ public class Simulation extends Thread {
         //Serialize TMyPlace object to string
         String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         
+        System.out.println("Client sending:\n" + serialized + "\n");
+        
         //call server socket to update cow position
         cowSocketOutput.println(serialized);
         
-        //Read content received from client (Simulation)
-        String line, data = "";
-        do {
-            line = cowSocketInput.readLine();
-            data += line;
-        } while (!line.contains("</MyPlace>"));
-        System.out.println("Received:\n" + data);
+        cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
         
+        // if 1024 it gives error
+        char[] buffer = new char[2048];
+        String message = "";
+        while (true) {
+            cowSocketInput.read(buffer);
+            message += new String(buffer); 
+            if (message.contains("</MyPlace>"))
+                break;
+        }
+        System.out.println("Client received:\n" + message.trim() + "...");
         //Deserilize result string to TMyPlace and return it
-        //return MessageManagement.retrievePlaceStateObject(message);
-        return currentMyPlace;
+        return MessageManagement.retrievePlaceStateObject(message.trim());
+        //return currentMyPlace;
     }
 
     private TMyPlace updateWolfPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {

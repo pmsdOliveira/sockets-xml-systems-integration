@@ -6,6 +6,8 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using System.Xml;
 
 namespace IS_TP1_ServerSocketCow
 {
@@ -70,64 +72,83 @@ namespace IS_TP1_ServerSocketCow
             return nextMyPlace;
         }
 
-        private static void StartListening()
+        private static string socketStreamToString(Socket handler, XmlSerializer deserializer)
         {
-            // Data buffers
             byte[] bytes = new Byte[1024];
+            string data = null;
 
+            while (true)
+            {
+                int bytesRec = handler.Receive(bytes);
+                data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                if (data.IndexOf("</MyPlace>") > -1)
+                    break;
+            }
+
+            return data;
+        }
+
+        private static string serializeTMyPlaceToString(tMyPlace myPlace, XmlSerializer serializer)
+        {
+            string xml = "";
+
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = false;
+            settings.Encoding = Encoding.UTF8;
+
+            using (MemoryStream stream = new MemoryStream())
+                using (XmlWriter writer = XmlWriter.Create(stream, settings))
+                {
+                    serializer.Serialize(writer, myPlace);
+                    xml = Encoding.ASCII.GetString(stream.ToArray());
+                }
+
+            // XmlWriter generates ??? in the beginning
+            return xml.Substring(3);
+        }
+
+        
+
+        private static void StartListening()
+        {       
+            // (De)serializer
             XmlSerializer serializer = new XmlSerializer(typeof(tMyPlace));
 
-            // Local endpoint for socket
+            // Local endpoint for TCP socket
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, portServer);
-
-            // TCP socket
             Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
-                // Bind socket to local endpoint
                 listener.Bind(localEndPoint);
-
-                // Enable listening for incoming connections
                 listener.Listen(10);
 
-                // For each incoming connection
+                // Block waiting for connection
+                Socket handler = listener.Accept();
+
                 while (true)
                 {
-                    // Blocks while waiting for connection
-                    Socket handler = listener.Accept();
-                    string data = null;
+                    Console.WriteLine("Waiting for a request...");
 
-                    while (true)
-                    {
-                        int bytesRec = handler.Receive(bytes);
-                        data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                        if (data.IndexOf("</MyPlace>") > -1)
-                            break;
-                    }
-
-                    Console.WriteLine("Received:\n{0}\n", data);
-
-                    tMyPlace currentMyPlace = (tMyPlace)serializer.Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(data)));
+                    string received = socketStreamToString(handler, serializer);
+                    Console.WriteLine("Server received:\n{0}\n", received);
+                    tMyPlace currentMyPlace = (tMyPlace) serializer
+                        .Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(received)));
                     tMyPlace nextMyPlace = updateCowPosition(currentMyPlace);
-
-                    string send = "";
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        serializer.Serialize(stream, nextMyPlace);
-                        send = Encoding.ASCII.GetString(stream.ToArray());
-                    }
-
-                    Console.WriteLine("Sending:\n{0}\n", send);
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
+                    string serialized = serializeTMyPlaceToString(nextMyPlace, serializer);
+                    Console.WriteLine("Server sending:\n{0}.\n", serialized);
+                    handler.Send(Encoding.ASCII.GetBytes(serialized));
+                    //handler.Shutdown(SocketShutdown.Both);
+                    //handler.Close();
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+
+            Console.WriteLine("Finished");
         }
 
         static void Main(string[] args)
