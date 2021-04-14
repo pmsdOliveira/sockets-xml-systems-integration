@@ -8,23 +8,18 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace IS_TP1_ServerSocketWolf
+namespace IS_TP1_ServerSocketDog
 {
     class Program
     {
-        private static int portServer = 4445;
-
-        private static double euclidianDistance(tPosition a, tPosition b)
-        {
-            return Math.Sqrt(Math.Pow(a.xx - b.xx, 2) + Math.Pow(a.yy - b.yy, 2));
-        }
+        private static int portServer = 4446;
 
         private static tPosition randomTPositionFromList(List<tPosition> positions)
         {
             return positions[new Random().Next(positions.Count)];
         }
 
-        private static tMyPlace updateWolfPosition(tMyPlace currentMyPlace)
+        private static tMyPlace updateDogPosition(tMyPlace currentMyPlace)
         {
             tMyPlace nextMyPlace = currentMyPlace;
 
@@ -37,50 +32,12 @@ namespace IS_TP1_ServerSocketWolf
             // Eating a cow restores 50 stamina
 
             //TODO: GET DOGS POSITIONS TO LATER RUN
-
-            List<tPosition> dogsPositions = places.Where(neighbour => neighbour.Dog)
-                .Select(dog => dog.Position).ToList();
-
-            List<tPosition> cowsPositions = places.Where(place => place.Cow)
-                .Select(cow => cow.Position).ToList();
-
             List<tPosition> validPositions = places
                 .Where(place => place.Position != null && !place.Obstacle && !place.Wolf && !place.Dog && !place.Cow)
                 .Select(validPlace => validPlace.Position).ToList();
             validPositions.Add(places[0].Position);
 
-            if (validPositions.Count > 0)
-            {
-                if (dogsPositions.Count > 0)
-                {
-                    double maxDistance = 0;
-                    tPosition maxDistancePosition = null;
-                    foreach (tPosition validPosition in validPositions)
-                    {
-                        double distance = 0;
-                        foreach (tPosition dogPosition in dogsPositions)
-                            distance += euclidianDistance(validPosition, dogPosition);
-
-                        double averageDistance = distance / dogsPositions.Count;
-                        if (averageDistance > maxDistance)
-                        {
-                            maxDistance = averageDistance;
-                            maxDistancePosition = validPosition;
-                        }
-                    }
-
-                    nextMyPlace.Place[0].Position = maxDistancePosition;
-                }
-                else if (cowsPositions.Count > 0)
-                { // choose random cow and move to it
-                    tPosition selectedCowPosition = randomTPositionFromList(cowsPositions);
-                    nextMyPlace.Place[0].Position = selectedCowPosition;
-                }
-                else
-                {
-                    nextMyPlace.Place[0].Position = randomTPositionFromList(validPositions);
-                }
-            }
+            nextMyPlace.Place[0].Position = randomTPositionFromList(validPositions);
 
             return nextMyPlace;
         }
@@ -144,12 +101,10 @@ namespace IS_TP1_ServerSocketWolf
                     tMyPlace currentMyPlace = (tMyPlace)serializer
                         .Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(received)));
 
-                    tMyPlace nextMyPlace = updateWolfPosition(currentMyPlace);
+                    tMyPlace nextMyPlace = updateDogPosition(currentMyPlace);
 
                     string serialized = serializeTMyPlaceToString(nextMyPlace, serializer);
                     handler.Send(Encoding.ASCII.GetBytes(serialized));
-                    //handler.Shutdown(SocketShutdown.Both);
-                    //handler.Close();
                 }
             }
             catch (Exception e)

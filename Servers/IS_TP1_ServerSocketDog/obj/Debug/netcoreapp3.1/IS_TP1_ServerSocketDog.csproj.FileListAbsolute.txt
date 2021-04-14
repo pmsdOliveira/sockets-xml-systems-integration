@@ -1,0 +1,13 @@
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.exe
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.deps.json
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.runtimeconfig.json
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.runtimeconfig.dev.json
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.dll
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\bin\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.pdb
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.csprojAssemblyReference.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.AssemblyInfoInputs.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.AssemblyInfo.cs
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.csproj.CoreCompileInputs.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.dll
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.pdb
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketDog\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketDog.genruntimeconfig.cache

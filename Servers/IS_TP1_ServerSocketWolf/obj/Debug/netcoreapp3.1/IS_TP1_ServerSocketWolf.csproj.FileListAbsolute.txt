@@ -10,3 +10,4 @@ C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_
 C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketWolf\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketWolf.dll
 C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketWolf\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketWolf.pdb
 C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketWolf\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketWolf.genruntimeconfig.cache
+C:\Users\Utilizador\Documents\GitHub\sockets-xml-systems-integration\Servers\IS_TP1_ServerSocketWolf\obj\Debug\netcoreapp3.1\IS_TP1_ServerSocketWolf.csprojAssemblyReference.cache

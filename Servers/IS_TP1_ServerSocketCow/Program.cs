@@ -36,7 +36,8 @@ namespace IS_TP1_ServerSocketCow
                 .Select(wolf => wolf.Position).ToList();
             List<tPosition> validPositions = neighbours
                 .Where(neighbour => neighbour.Position != null && !neighbour.Obstacle
-                    && neighbour.Grass > 0 && !neighbour.Wolf && !neighbour.Cow)
+                    && neighbour.Grass > 0 && !neighbour.Wolf && !neighbour.Cow
+                    && !neighbour.Dog)
                 .Select(validNeighbour => validNeighbour.Position).ToList();
 
             if (currentPlace.Grass > 0)
