@@ -47,17 +47,20 @@ public class Simulation extends Thread {
         simulationSpeed = speed;
         
         try {
-            cowSocket = new Socket("localhost", cowPort);
-            //wolfSocket = new Socket("localhost", wolfPort);
-            cowSocketOutput = new PrintStream(cowSocket.getOutputStream());
-            cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
-            //wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
-            //wolfSocketInput = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
+            if (Cows > 0) {
+                cowSocket = new Socket("localhost", cowPort);
+                cowSocketOutput = new PrintStream(cowSocket.getOutputStream());
+                cowSocketInput = new BufferedReader(new InputStreamReader(cowSocket.getInputStream()));
+            }
+            
+            if (Wolfs > 0) {
+                wolfSocket = new Socket("localhost", wolfPort);
+                wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
+                wolfSocketInput = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
+            }         
         } catch (Exception e) {
             System.err.println(e.toString());
         }
-        
-        
         
         generateEnvironment(obstacles, wolfs, cows);
         /*
@@ -416,15 +419,12 @@ public class Simulation extends Thread {
         //Serialize TMyPlace object to string
         String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
         //call server socket to update cow position
-        //wolfSocketOutput.println(serialized);
+        wolfSocketOutput.println(serialized);
         
         //Read content received from client (Simulation)      
-        //String line, message = "";
-        //while (!(line = wolfSocketInput.readLine()).equals(""))
-        //    message += line;
+        String received = wolfSocketInput.readLine().trim();
         
         //Deserilize result string to TMyPlace and return it
-        //return MessageManagement.retrievePlaceStateObject(message);
-        return currentMyPlace;
+        return MessageManagement.retrievePlaceStateObject(received);
     }
 }
