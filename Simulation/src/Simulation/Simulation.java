@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
+import com.google.gson.Gson;
 import org.netbeans.xml.schema.updateschema.TMyPlace;
 import org.netbeans.xml.schema.updateschema.TPlace;
 import org.netbeans.xml.schema.updateschema.TPosition;
@@ -31,6 +33,7 @@ public class Simulation extends Thread {
     private static final int wolfPort = 4445;
     private static final int dogPort = 4446;
     private static final int minerPort = 4447;
+    private static final int plotsPort = 4448;
 
     private TPlace[][] myEnvironment;
     private EnvironmentGUI myGUI;
@@ -40,11 +43,12 @@ public class Simulation extends Thread {
     private HashMap<String, TPosition> minerList = new HashMap<>();
     private HashMap<String, TPosition> obstacleList = new HashMap<>();
     private int simulationSpeed;
-    private Socket cowSocket, wolfSocket, dogSocket, minerSocket;
-    private PrintStream cowSocketOutput, wolfSocketOutput, dogSocketOutput, minerSocketOutput;
-    private BufferedReader cowSocketInput, wolfSocketInput, dogSocketInput, minerSocketInput;
+    private Socket cowSocket, wolfSocket, dogSocket, minerSocket, plotsSocket;
+    private ServerSocket plotsServerSocket;
+    private PrintStream cowSocketOutput, wolfSocketOutput, dogSocketOutput, minerSocketOutput, plotsSocketOutput;
+    private BufferedReader cowSocketInput, wolfSocketInput, dogSocketInput, minerSocketInput, plotsSocketInput;
 
-    public Simulation(int Cows, int Wolfs, int Dogs, int Miners, int Obstacles, int speed) throws IOException {
+    public Simulation(int Cows, int Wolfs, int Dogs, int Miners, int Obstacles, boolean Plots, int speed) throws IOException {
         myEnvironment = new TPlace[15][15];
         int obstacles = Obstacles;
         int wolfs = Wolfs;
@@ -76,6 +80,13 @@ public class Simulation extends Thread {
                 minerSocket = new Socket("localhost", minerPort);
                 minerSocketOutput = new PrintStream(minerSocket.getOutputStream());
                 minerSocketInput = new BufferedReader(new InputStreamReader(minerSocket.getInputStream()));
+            }
+            
+            if (Plots) {
+                plotsServerSocket = new ServerSocket(plotsPort);
+                plotsSocket = plotsServerSocket.accept();
+                plotsSocketOutput = new PrintStream(plotsSocket.getOutputStream());
+                plotsSocketInput = new BufferedReader(new InputStreamReader(plotsSocket.getInputStream()));
             }
         } catch (Exception e) {
             System.err.println(e.toString());
@@ -608,6 +619,11 @@ public class Simulation extends Thread {
 
                 this.myGUI.updateGUI(this.myEnvironment);
                 this.updateGrass();
+                
+                if (plotsSocket != null) {
+                    String request = plotsSocketInput.readLine();
+                    
+                }
 
                 Thread.sleep(simulationSpeed);
             } catch (InterruptedException ex) {

@@ -45,6 +45,7 @@ public class StartWindow extends javax.swing.JFrame {
         jSpinnerDogs = new javax.swing.JSpinner();
         jLabel7 = new javax.swing.JLabel();
         jSpinnerMiners = new javax.swing.JSpinner();
+        jPlotsBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -77,6 +78,13 @@ public class StartWindow extends javax.swing.JFrame {
 
         jLabel7.setText("Number Of Miners");
 
+        jPlotsBox.setText("Plots");
+        jPlotsBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPlotsBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -107,7 +115,11 @@ public class StartWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jSpinnerMiners, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jSpinnerMiners, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jPlotsBox)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -135,7 +147,9 @@ public class StartWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jSpinnerObstacles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(33, 33, 33)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPlotsBox)
+                .addGap(9, 9, 9)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -165,6 +179,7 @@ public class StartWindow extends javax.swing.JFrame {
                         Integer.parseInt(jSpinnerDogs.getValue().toString()),
                         Integer.parseInt(jSpinnerMiners.getValue().toString()),
                         Integer.parseInt(jSpinnerObstacles.getValue().toString()),
+                        jPlotsBox.isSelected(),
                         jSlider1.getValue());
                 myEnvironment.start();
                 this.setVisible(false);
@@ -173,6 +188,10 @@ public class StartWindow extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButtonStartActionPerformed
+
+    private void jPlotsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPlotsBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPlotsBoxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -218,6 +237,7 @@ public class StartWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JCheckBox jPlotsBox;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JSpinner jSpinnerCows;
     private javax.swing.JSpinner jSpinnerDogs;
