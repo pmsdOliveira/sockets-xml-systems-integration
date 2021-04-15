@@ -6,6 +6,7 @@
 package Simulation;
 
 import Common.MessageManagement;
+import JSON.PlotData;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,6 +48,7 @@ public class Simulation extends Thread {
     private ServerSocket plotsServerSocket;
     private PrintStream cowSocketOutput, wolfSocketOutput, dogSocketOutput, minerSocketOutput, plotsSocketOutput;
     private BufferedReader cowSocketInput, wolfSocketInput, dogSocketInput, minerSocketInput, plotsSocketInput;
+    private PlotData plotData;
 
     public Simulation(int Cows, int Wolfs, int Dogs, int Miners, int Obstacles, boolean Plots, int speed) throws IOException {
         myEnvironment = new TPlace[15][15];
@@ -87,6 +89,8 @@ public class Simulation extends Thread {
                 plotsSocket = plotsServerSocket.accept();
                 plotsSocketOutput = new PrintStream(plotsSocket.getOutputStream());
                 plotsSocketInput = new BufferedReader(new InputStreamReader(plotsSocket.getInputStream()));
+                
+                plotData = new PlotData();
             }
         } catch (Exception e) {
             System.err.println(e.toString());
@@ -621,7 +625,14 @@ public class Simulation extends Thread {
                 this.updateGrass();
                 
                 if (plotsSocket != null) {
-                    String request = plotsSocketInput.readLine();
+                    Gson gson = new Gson();
+                    String received = plotsSocketInput.readLine();
+                    PlotData request = gson.fromJson(received, PlotData.class);
+                    if (!request.equals(plotData)) {
+                        request = plotData;
+                    }
+                    
+                    plotsSocketOutput.println(gson.toJson(request));
                     
                 }
 
