@@ -38,6 +38,7 @@ public class Simulation extends Thread {
     private HashMap<String, TPosition> cowList = new HashMap<>();
     private HashMap<String, TPosition> dogList = new HashMap<>();
     private HashMap<String, TPosition> minerList = new HashMap<>();
+    private HashMap<String, TPosition> obstacleList = new HashMap<>();
     private int simulationSpeed;
     private Socket cowSocket, wolfSocket, dogSocket, minerSocket;
     private PrintStream cowSocketOutput, wolfSocketOutput, dogSocketOutput, minerSocketOutput;
@@ -95,6 +96,7 @@ public class Simulation extends Thread {
         putWolfs(wolfs);
         putCows(cows);
         putDogs(dogs);
+        putMiners(miners);
     }
 
     /*
@@ -126,8 +128,16 @@ public class Simulation extends Thread {
                 Random randY = new Random();
                 posX = randX.nextInt((14 - 0) + 1) + 0;
                 posY = randY.nextInt((14 - 0) + 1) + 0;
-            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog());
+            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() 
+                    || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog() 
+                    || myEnvironment[posX][posY].isMiner());
             myEnvironment[posX][posY].setObstacle(true);
+            
+            myEnvironment[posX][posY].setEntity("Obstacle_" + i);
+            TPosition tPosition = new TPosition();
+            tPosition.setXx(posX);
+            tPosition.setYy(posY);
+            this.obstacleList.put("Obstacle_" + i, tPosition);
         }
     }
 
@@ -143,7 +153,9 @@ public class Simulation extends Thread {
                 Random randY = new Random();
                 posX = randX.nextInt((14 - 0) + 1) + 0;
                 posY = randY.nextInt((14 - 0) + 1) + 0;
-            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog());
+            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() 
+                    || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog() 
+                    || myEnvironment[posX][posY].isMiner());
             myEnvironment[posX][posY].setWolf(true);
 
             myEnvironment[posX][posY].setEntity("Wolf_" + i);
@@ -168,7 +180,9 @@ public class Simulation extends Thread {
                 Random randY = new Random();
                 posX = randX.nextInt((14 - 0) + 1) + 0;
                 posY = randY.nextInt((14 - 0) + 1) + 0;
-            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog());
+            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() 
+                    || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog() 
+                    || myEnvironment[posX][posY].isMiner());
             myEnvironment[posX][posY].setCow(true);
             myEnvironment[posX][posY].setEntity("Cow_" + CowID);
             TPosition tPosition = new TPosition();
@@ -184,7 +198,6 @@ public class Simulation extends Thread {
      * Put dogs in the environment
      */
     private void putDogs(int dogs) {
-        int DogID = 0;
         for (int i = 0; i < dogs; i++) {
             int posX;
             int posY;
@@ -193,15 +206,38 @@ public class Simulation extends Thread {
                 Random randY = new Random();
                 posX = randX.nextInt((14 - 0) + 1) + 0;
                 posY = randY.nextInt((14 - 0) + 1) + 0;
-            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog());
+            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() 
+                    || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog() 
+                    || myEnvironment[posX][posY].isMiner());
             myEnvironment[posX][posY].setDog(true);
-            myEnvironment[posX][posY].setEntity("Dog_" + DogID);
+            myEnvironment[posX][posY].setEntity("Dog_" + i);
             TPosition tPosition = new TPosition();
             tPosition.setXx(posX);
             tPosition.setYy(posY);
 
-            this.dogList.put("Dog_" + DogID, tPosition);
-            DogID++;
+            this.dogList.put("Dog_" + i, tPosition);
+        }
+    }
+    
+    private void putMiners(int miner) {
+        for (int i = 0; i < miner; i++) {
+            int posX;
+            int posY;
+            do {
+                Random randX = new Random();
+                Random randY = new Random();
+                posX = randX.nextInt((14 - 0) + 1) + 0;
+                posY = randY.nextInt((14 - 0) + 1) + 0;
+            } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() 
+                    || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog() 
+                    || myEnvironment[posX][posY].isMiner());
+            myEnvironment[posX][posY].setMiner(true);
+            myEnvironment[posX][posY].setEntity("Miner_" + i);
+            TPosition tPosition = new TPosition();
+            tPosition.setXx(posX);
+            tPosition.setYy(posY);
+
+            this.minerList.put("Miner_" + i, tPosition);
         }
     }
 
@@ -328,7 +364,8 @@ public class Simulation extends Thread {
                             && this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getGrass() == 0) //With grass
                             && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isObstacle() //Without obstacle
                             && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isCow()    //Without cow
-                            && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isDog()) {  //Without dog
+                            && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isDog()
+                            && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {  //Without dog
                         this.myEnvironment[lastX][lastY].setEntity(null); //Remove from last postion
                         this.myEnvironment[lastX][lastY].setCow(false); //Remove from last position
                         this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setEntity(cowName); //Put in new position
@@ -354,6 +391,13 @@ public class Simulation extends Thread {
                             }                                                                                      //else keep cow in the some position
                         }
                         if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isDog()) {
+                            if (this.myEnvironment[lastX][lastY].getGrass() == 0) { //No grass in last position
+                                this.myEnvironment[lastX][lastY].setEntity(null); //Remove from last position
+                                this.myEnvironment[lastX][lastY].setCow(false);   //Remove from last position
+                                cowsToKill.add(cowName);//Add to the list to remove later
+                            }    
+                        }
+                        if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {
                             if (this.myEnvironment[lastX][lastY].getGrass() == 0) { //No grass in last position
                                 this.myEnvironment[lastX][lastY].setEntity(null); //Remove from last position
                                 this.myEnvironment[lastX][lastY].setCow(false);   //Remove from last position
@@ -406,6 +450,9 @@ public class Simulation extends Thread {
                             }
                             if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isDog()) {
                                 //Moving to dog
+                            }
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {
+                                //Moving to miner
                             }
                             if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isCow()) {
                                 String lastEntity = this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getEntity(); //Entity of Cow in the new positin
@@ -466,13 +513,97 @@ public class Simulation extends Thread {
                             if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isCow()) {
                                 //Moving to cow
                             }
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {
+                                //Moving to miner
+                            }
                         }
                     }
 
                 }
+                
                 //Remove dogs from HashMap
                 for (String dogID : dogsToKill) {
                     this.dogList.remove(dogID);
+                }
+                
+                //send update for all obstacles
+                ArrayList<String> obstaclesToKill = new ArrayList<>();
+                for (String obstacleName : this.obstacleList.keySet()) {
+                    TPosition myPosition = new TPosition();
+                    myPosition.setXx(obstacleList.get(obstacleName).getXx());
+                    myPosition.setYy(obstacleList.get(obstacleName).getYy());
+                    if (this.myEnvironment[myPosition.getXx()][myPosition.getYy()].isMiner()) {
+                        this.myEnvironment[myPosition.getXx()][myPosition.getYy()].setEntity(null);
+                        this.myEnvironment[myPosition.getXx()][myPosition.getYy()].setObstacle(false);
+                        
+                        obstaclesToKill.add(obstacleName);
+                    }
+                    myPosition.setYy(this.obstacleList.get(obstacleName).getYy());
+
+                }
+                //Remove obstacles from HashMap
+                for (String obstacleID : obstaclesToKill) {
+                    this.minerList.remove(obstacleID);
+                }
+                
+                //send update for all miners
+                ArrayList<String> minersToKill = new ArrayList<>();
+                for (String minerName : this.minerList.keySet()) {
+                    TMyPlace myNewPosition = updateMinerPosition(createMyPlace(this.minerList.get(minerName).getXx(), this.minerList.get(minerName).getYy()));
+                    TPlace myPlace = myNewPosition.getPlace().get(0); //New position
+                    //updateDogPosition
+                    if (this.minerList.containsKey(minerName)) { //Search for the name in the hashmap (Wolf)        
+
+                        int lastX = this.minerList.get(minerName).getXx();   //Last position Xx
+                        int lastY = this.minerList.get(minerName).getYy();   //Last position Yy
+
+                        if (!(this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isWolf()) //Movement to an empty position 
+                                && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isObstacle()
+                                && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isCow()
+                                && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isDog()
+                                && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {
+                            this.myEnvironment[lastX][lastY].setEntity(null);
+                            this.myEnvironment[lastX][lastY].setMiner(false);
+
+                            this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setEntity(minerName);
+                            this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setMiner(true);
+                            this.minerList.get(minerName).setXx(myPlace.getPosition().getXx());
+                            this.minerList.get(minerName).setYy(myPlace.getPosition().getYy());
+
+                        } else {
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isDog()) {
+                                //Dog in the same position
+                            }
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isObstacle()) {
+                                String lastEntity = this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getEntity();
+
+                                //UpdateTable
+                                this.myEnvironment[lastX][lastY].setEntity(null); //Remove wolf from last position
+                                this.myEnvironment[lastX][lastY].setMiner(false);  //Remove wolf from last position
+                                this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setEntity(minerName);
+                                this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setMiner(true);
+
+                                this.minerList.get(minerName).setXx(myPlace.getPosition().getXx());
+                                this.minerList.get(minerName).setYy(myPlace.getPosition().getYy());
+                                this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setObstacle(false);
+                                this.obstacleList.remove(lastEntity);
+                            }
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isWolf()) {
+                                //Moving to wolf
+                            }
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isCow()) {
+                                //Moving to cow
+                            }
+                            if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {
+                                //Moving to miner
+                            }
+                        }
+                    }
+
+                }
+                //Remove miners from HashMap
+                for (String minerID : minersToKill) {
+                    this.minerList.remove(minerID);
                 }
 
                 this.myGUI.updateGUI(this.myEnvironment);
@@ -544,6 +675,26 @@ public class Simulation extends Thread {
         
         //Read content received from client (Simulation)      
         String received = dogSocketInput.readLine().trim();
+        
+        //Deserilize result string to TMyPlace and return it
+        return MessageManagement.retrievePlaceStateObject(received);
+    }
+    
+    private TMyPlace updateMinerPosition(TMyPlace currentMyPlace) throws JAXBException, IOException {
+        //TODO Lab 2:
+        //Serialize and deserialize TMyPlace Object to verify if the the methods from MessageManagement are properly working
+        
+        // String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        // TMyPlace unserialized = MessageManagement.retrievePlaceStateObject(serialized);
+        
+        //TODO Lab 3 & 4:
+        //Serialize TMyPlace object to string
+        String serialized = MessageManagement.createPlaceStateContent(currentMyPlace);
+        //call server socket to update cow position
+        minerSocketOutput.println(serialized);
+        
+        //Read content received from client (Simulation)      
+        String received = minerSocketInput.readLine().trim();
         
         //Deserilize result string to TMyPlace and return it
         return MessageManagement.retrievePlaceStateObject(received);

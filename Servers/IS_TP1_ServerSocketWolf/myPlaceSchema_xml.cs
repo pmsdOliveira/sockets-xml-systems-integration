@@ -54,6 +54,8 @@ public partial class tPlace {
     
     private bool dogField;
     
+    private bool minerField;
+    
     private bool obstacleField;
     
     private string entityField;
@@ -101,6 +103,16 @@ public partial class tPlace {
         }
         set {
             this.dogField = value;
+        }
+    }
+    
+    /// <observações/>
+    public bool Miner {
+        get {
+            return this.minerField;
+        }
+        set {
+            this.minerField = value;
         }
     }
     

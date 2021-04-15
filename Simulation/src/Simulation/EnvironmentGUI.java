@@ -1759,7 +1759,8 @@ public class EnvironmentGUI extends javax.swing.JFrame {
     public void updateGUI(TPlace[][] myEnvironment) {
         for (int x = 0; x < 15; x++) {
             for (int y = 0; y < 15; y++) {
-                if (!myEnvironment[x][y].isCow() && !myEnvironment[x][y].isWolf() && !myEnvironment[x][y].isObstacle() && !myEnvironment[x][y].isDog()) {
+                if (!myEnvironment[x][y].isCow() && !myEnvironment[x][y].isWolf() && !myEnvironment[x][y].isObstacle() 
+                        && !myEnvironment[x][y].isDog() && !myEnvironment[x][y].isMiner()) {
                     myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Ground" + myEnvironment[x][y].getGrass() + ".png"));
                 }else if(myEnvironment[x][y].isObstacle()){
                     myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Obstacle.png"));
@@ -1769,6 +1770,8 @@ public class EnvironmentGUI extends javax.swing.JFrame {
                     myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Cow.png"));
                 }else if(myEnvironment[x][y].isDog()) {
                     myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Dog.png"));
+                }else if(myEnvironment[x][y].isMiner()) {
+                    myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Miner.png"));
                 }
             }
         }
