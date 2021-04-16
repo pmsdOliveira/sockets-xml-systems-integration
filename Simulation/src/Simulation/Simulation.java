@@ -651,7 +651,6 @@ public class Simulation extends Thread {
                     String request = plotsSocketInput.readLine();
                     PlotData requestPlot = gson.fromJson(request, PlotData.class);
                     
-                    System.out.println(request);
                     plotData = updatePlotData(plotData);
                     
                     String response;
@@ -659,8 +658,7 @@ public class Simulation extends Thread {
                         response = request;
                     else
                         response = gson.toJson(plotData, PlotData.class);
-                    
-                    System.out.println(response);
+
                     plotsSocketOutput.println(response);
                 }
 
@@ -762,13 +760,14 @@ public class Simulation extends Thread {
         plotData.setMinersAlive(minerList.size());
         plotData.setObstaclesAlive(obstacleList.size());
         
-        int i = 0;
-        for (String wolfName: wolfList.keySet())
-            plotData.addWolfKills(wolfName, wolvesKills[i++].getKills().size());
         
-        i = 0;
-        for (String minerName: minerList.keySet())
-            plotData.addMinerKills(minerName, minersKills[i++].getKills().size());
+        for (int i = 0; i < wolvesKills.length; i++) {
+            plotData.addWolfKills("Wolf_" + i, wolvesKills[i].getKills().size());
+        }
+        
+        for (int i = 0; i < minersKills.length; i++) {
+            plotData.addMinerKills("Miner_" + i, minersKills[i].getKills().size());
+        }
         
         return plotData;
     }

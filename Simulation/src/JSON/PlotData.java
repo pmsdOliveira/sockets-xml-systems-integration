@@ -108,8 +108,20 @@ public class PlotData {
     }
     
     public void addWolfKills(String id, int n) {
-        KillCount killCount = new KillCount(id, n);
-        this.wolvesKills.add(killCount);
+        int wolfID = Integer.parseInt(String.valueOf(id.charAt(id.length() - 1)));
+        
+        boolean exists = false;
+        if (wolfID < wolvesKills.size())
+            if (wolvesKills.contains(wolvesKills.get(wolfID))) {
+                exists = true;
+            } 
+        
+        if (exists) {
+            wolvesKills.get(wolfID).setKills(n);
+        } else {
+            KillCount killCount = new KillCount(id, n);
+            this.wolvesKills.add(killCount);
+        }
     }
     
     public int getMinersKills(int id) {
@@ -117,7 +129,19 @@ public class PlotData {
     }
     
     public void addMinerKills(String id, int n) {
-        KillCount killCount = new KillCount(id, n);
-        this.minersKills.add(killCount);
+        int minerID = Integer.parseInt(String.valueOf(id.charAt(id.length() - 1)));
+        
+        boolean exists = false;
+        if (minerID < minersKills.size())
+            if (minersKills.contains(minersKills.get(minerID))) {
+                exists = true;
+            } 
+        
+        if (exists) {
+            minersKills.get(minerID).setKills(n);
+        } else {
+            KillCount killCount = new KillCount(id, n);
+            this.minersKills.add(killCount);
+        }
     }
 }

@@ -140,7 +140,7 @@ namespace IS_TP1_ServerSocketWolf
 
                 while (true)
                 {
-                    string received = socketStreamToString(handler, serializer);
+                    string received = socketStreamToString(handler, serializer).Trim();
                     tMyPlace currentMyPlace = (tMyPlace)serializer
                         .Deserialize(new MemoryStream(Encoding.ASCII.GetBytes(received)));
 
