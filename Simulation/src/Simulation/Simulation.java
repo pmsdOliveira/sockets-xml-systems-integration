@@ -43,12 +43,15 @@ public class Simulation extends Thread {
     private HashMap<String, TPosition> dogList = new HashMap<>();
     private HashMap<String, TPosition> minerList = new HashMap<>();
     private HashMap<String, TPosition> obstacleList = new HashMap<>();
+    private KillList[] wolvesKills;
+    private KillList[] minersKills;
     private int simulationSpeed;
     private Socket cowSocket, wolfSocket, dogSocket, minerSocket, plotsSocket;
     private ServerSocket plotsServerSocket;
     private PrintStream cowSocketOutput, wolfSocketOutput, dogSocketOutput, minerSocketOutput, plotsSocketOutput;
     private BufferedReader cowSocketInput, wolfSocketInput, dogSocketInput, minerSocketInput, plotsSocketInput;
     private PlotData plotData;
+    private int counter;
 
     public Simulation(int Cows, int Wolfs, int Dogs, int Miners, int Obstacles, boolean Plots, int speed) throws IOException {
         myEnvironment = new TPlace[15][15];
@@ -58,6 +61,7 @@ public class Simulation extends Thread {
         int dogs = Dogs;
         int miners = Miners;
         simulationSpeed = speed;
+        counter = 0;
         
         try {
             if (Cows > 0) {
@@ -67,6 +71,7 @@ public class Simulation extends Thread {
             }
             
             if (Wolfs > 0) {
+                wolvesKills = new KillList[Wolfs];
                 wolfSocket = new Socket("localhost", wolfPort);
                 wolfSocketOutput = new PrintStream(wolfSocket.getOutputStream());
                 wolfSocketInput = new BufferedReader(new InputStreamReader(wolfSocket.getInputStream()));
@@ -79,6 +84,7 @@ public class Simulation extends Thread {
             }
             
             if (Miners > 0) {
+                minersKills = new KillList[Miners];
                 minerSocket = new Socket("localhost", minerPort);
                 minerSocketOutput = new PrintStream(minerSocket.getOutputStream());
                 minerSocketInput = new BufferedReader(new InputStreamReader(minerSocket.getInputStream()));
@@ -178,6 +184,8 @@ public class Simulation extends Thread {
             tPosition.setXx(posX);
             tPosition.setYy(posY);
             this.wolfList.put("Wolf_" + i, tPosition);
+            
+            this.wolvesKills[i] = new KillList();
         }
     }
 
@@ -253,6 +261,7 @@ public class Simulation extends Thread {
             tPosition.setYy(posY);
 
             this.minerList.put("Miner_" + i, tPosition);
+            this.minersKills[i] = new KillList();
         }
     }
 
@@ -470,8 +479,11 @@ public class Simulation extends Thread {
                                 //Moving to miner
                             }
                             if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isCow()) {
-                                String lastEntity = this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getEntity(); //Entity of Cow in the new positin
-
+                                String cowName = this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getEntity();
+                                
+                                int wolfID = Integer.parseInt(String.valueOf(wolfName.charAt(wolfName.length() - 1)));
+                                wolvesKills[wolfID].addKill(cowName);
+                                
                                 //UpdateTable
                                 this.myEnvironment[lastX][lastY].setEntity(null); //Remove wolf from last position
                                 this.myEnvironment[lastX][lastY].setWolf(false);  //Remove wolf from last position
@@ -481,7 +493,7 @@ public class Simulation extends Thread {
                                 this.wolfList.get(wolfName).setXx(myPlace.getPosition().getXx());
                                 this.wolfList.get(wolfName).setYy(myPlace.getPosition().getYy());
                                 this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setCow(false);
-                                this.cowList.remove(lastEntity);
+                                this.cowList.remove(cowName);
                             }
                         }
                     }
@@ -548,10 +560,15 @@ public class Simulation extends Thread {
                     myPosition.setXx(obstacleList.get(obstacleName).getXx());
                     myPosition.setYy(obstacleList.get(obstacleName).getYy());
                     if (this.myEnvironment[myPosition.getXx()][myPosition.getYy()].isMiner()) {
+                        String minerName = this.myEnvironment[myPosition.getXx()][myPosition.getYy()].getEntity();
+                        
                         this.myEnvironment[myPosition.getXx()][myPosition.getYy()].setEntity(null);
                         this.myEnvironment[myPosition.getXx()][myPosition.getYy()].setObstacle(false);
                         
                         obstaclesToKill.add(obstacleName);
+                        
+                        int minerID = Integer.parseInt(String.valueOf(minerName.charAt(minerName.length() - 2)));
+                        minersKills[minerID].addKill(obstacleName);
                     }
                     myPosition.setYy(this.obstacleList.get(obstacleName).getYy());
 
@@ -590,8 +607,11 @@ public class Simulation extends Thread {
                                 //Dog in the same position
                             }
                             if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isObstacle()) {
-                                String lastEntity = this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getEntity();
-
+                                String obstacleName = this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getEntity();
+                                
+                                int minerID = Integer.parseInt(String.valueOf(minerName.charAt(minerName.length() - 1)));
+                                minersKills[minerID].addKill(obstacleName);
+                                
                                 //UpdateTable
                                 this.myEnvironment[lastX][lastY].setEntity(null); //Remove wolf from last position
                                 this.myEnvironment[lastX][lastY].setMiner(false);  //Remove wolf from last position
@@ -601,7 +621,7 @@ public class Simulation extends Thread {
                                 this.minerList.get(minerName).setXx(myPlace.getPosition().getXx());
                                 this.minerList.get(minerName).setYy(myPlace.getPosition().getYy());
                                 this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setObstacle(false);
-                                this.obstacleList.remove(lastEntity);
+                                this.obstacleList.remove(obstacleName);
                             }
                             if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isWolf()) {
                                 //Moving to wolf
@@ -622,27 +642,35 @@ public class Simulation extends Thread {
                 }
 
                 this.myGUI.updateGUI(this.myEnvironment);
-                this.updateGrass();
+                if (this.counter % 2 == 0)
+                    this.updateGrass();
+                this.counter++;
                 
                 if (plotsSocket != null) {
                     Gson gson = new Gson();
-                    String received = plotsSocketInput.readLine();
-                    PlotData request = gson.fromJson(received, PlotData.class);
-                    if (!request.equals(plotData)) {
-                        request = plotData;
-                    }
+                    String request = plotsSocketInput.readLine();
+                    PlotData requestPlot = gson.fromJson(request, PlotData.class);
                     
-                    plotsSocketOutput.println(gson.toJson(request));
+                    System.out.println(request);
+                    plotData = updatePlotData(plotData);
                     
+                    String response;
+                    if (requestPlot.equals(plotData))
+                        response = request;
+                    else
+                        response = gson.toJson(plotData, PlotData.class);
+                    
+                    System.out.println(response);
+                    plotsSocketOutput.println(response);
                 }
 
                 Thread.sleep(simulationSpeed);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(KillCount.class.getName()).log(Level.SEVERE, null, ex);
             } catch (JAXBException ex) {
-                Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(KillCount.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(KillCount.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -725,5 +753,23 @@ public class Simulation extends Thread {
         
         //Deserilize result string to TMyPlace and return it
         return MessageManagement.retrievePlaceStateObject(received);
+    }
+    
+    private PlotData updatePlotData(PlotData plotData) {
+        plotData.setCowsAlive(cowList.size());
+        plotData.setWolvesAlive(wolfList.size());
+        plotData.setDogsAlive(dogList.size());
+        plotData.setMinersAlive(minerList.size());
+        plotData.setObstaclesAlive(obstacleList.size());
+        
+        int i = 0;
+        for (String wolfName: wolfList.keySet())
+            plotData.addWolfKills(wolfName, wolvesKills[i++].getKills().size());
+        
+        i = 0;
+        for (String minerName: minerList.keySet())
+            plotData.addMinerKills(minerName, minersKills[i++].getKills().size());
+        
+        return plotData;
     }
 }

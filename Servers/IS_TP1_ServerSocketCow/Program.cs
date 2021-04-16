@@ -138,8 +138,6 @@ namespace IS_TP1_ServerSocketCow
 
                     string serialized = serializeTMyPlaceToString(nextMyPlace, serializer);
                     handler.Send(Encoding.ASCII.GetBytes(serialized));
-                    //handler.Shutdown(SocketShutdown.Both);
-                    //handler.Close();
                 }
             }
             catch (Exception e)

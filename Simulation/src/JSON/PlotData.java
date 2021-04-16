@@ -1,9 +1,11 @@
 package JSON;
 
 
+import Simulation.KillCount;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 
 
@@ -30,21 +32,13 @@ public class PlotData {
     @Expose
     private int obstaclesAlive;
     
-    @SerializedName("cowsKilled")
+    @SerializedName("wolvesKills")
     @Expose
-    private int cowsKilled;
+    private List<KillCount> wolvesKills;
     
-    @SerializedName("obstaclesDestroyed")
+    @SerializedName("minersKills")
     @Expose
-    private int obstaclesDestroyed;
-    
-    @SerializedName("cowsKilledByWolves")
-    @Expose
-    private HashMap<String, Integer> cowsKilledByWolves;
-    
-    @SerializedName("obstaclesDestroyedByMiners")
-    @Expose
-    private HashMap<String, Integer> obstaclesDestroyedByMiners;
+    private List<KillCount> minersKills;
     
     public PlotData() {
         this.cowsAlive = 0;
@@ -52,11 +46,9 @@ public class PlotData {
         this.dogsAlive = 0;
         this.minersAlive = 0;
         this.obstaclesAlive = 0;
-        this.cowsKilled = 0;
-        this.obstaclesDestroyed = 0;
         
-        cowsKilledByWolves = new HashMap<>();
-        obstaclesDestroyedByMiners = new HashMap<>();
+        wolvesKills = new ArrayList<>();
+        minersKills = new ArrayList<>();
     }
     
     public PlotData(int cowsAlive, int wolvesAlive, int dogsAlive, 
@@ -66,11 +58,9 @@ public class PlotData {
         this.dogsAlive = dogsAlive;
         this.minersAlive = minersAlive;
         this.obstaclesAlive = obstaclesAlive;
-        this.cowsKilled = cowsKilled;
-        this.obstaclesDestroyed = obstaclesKilled;
         
-        cowsKilledByWolves = new HashMap<>();
-        obstaclesDestroyedByMiners = new HashMap<>();
+        wolvesKills = new ArrayList<>();
+        minersKills = new ArrayList<>();
     }
     
     public int getCowsAlive() {
@@ -113,51 +103,21 @@ public class PlotData {
         this.obstaclesAlive = n;
     }
     
-    public int getCowsKilled() {
-        return this.cowsKilled;
+    public int getWolfKills(int id) {
+        return this.wolvesKills.get(id).getKills();
     }
     
-    public void setCowsKilled(int n) {
-        this.cowsKilled = n;
+    public void addWolfKills(String id, int n) {
+        KillCount killCount = new KillCount(id, n);
+        this.wolvesKills.add(killCount);
     }
     
-    public int getObstaclesDestroyed() {
-        return this.obstaclesDestroyed;
+    public int getMinersKills(int id) {
+        return this.minersKills.get(id).getKills();
     }
     
-    public void setObstaclesDestroyed(int n) {
-        this.obstaclesDestroyed = n;
-    }
-    
-    public int getCowsKilledByWolf(String s) {
-        return this.cowsKilledByWolves.get(s);
-    }
-    
-    public void setCowsKilledByWolf(String s, int n) {
-        this.cowsKilledByWolves.put(s, n);
-    }
-    
-    public int getObstaclesDestroyedByMiner(String s) {
-        return this.obstaclesDestroyedByMiners.get(s);
-    }
-    
-    public void setObstaclesDestroyedByMiner(String s, int n) {
-        this.obstaclesDestroyedByMiners.put(s, n);
-    }
-    
-    public HashMap getCowsKilledByWolves() {
-        return this.cowsKilledByWolves;
-    }
-    
-    public void setCowsKilledByWolves(HashMap cowsKilledByWolves) {
-        this.cowsKilledByWolves = cowsKilledByWolves;
-    }
-    
-    public HashMap getObstaclesDestroyedByMiners() {
-        return this.obstaclesDestroyedByMiners;
-    }
-    
-    public void setObstaclesDestroyedByMiners(HashMap obstaclesDestroyedByMiners) {
-        this.obstaclesDestroyedByMiners = obstaclesDestroyedByMiners;
+    public void addMinerKills(String id, int n) {
+        KillCount killCount = new KillCount(id, n);
+        this.minersKills.add(killCount);
     }
 }

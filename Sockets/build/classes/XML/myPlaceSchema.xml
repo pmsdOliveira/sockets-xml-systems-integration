@@ -17,6 +17,7 @@
             <xsd:element name="Wolf" type="xsd:boolean"/>
             <xsd:element name="Cow" type="xsd:boolean"/>
             <xsd:element name="Dog" type="xsd:boolean"/>
+            <xsd:element name="Miner" type="xsd:boolean"/>
             <xsd:element name="Obstacle" type="xsd:boolean"/>
             <xsd:element name="Entity" type="xsd:string"/>
             <xsd:element name="Position" type="tns:tPosition"/>
