@@ -1767,7 +1767,10 @@ public class EnvironmentGUI extends javax.swing.JFrame {
                 }else if(myEnvironment[x][y].isWolf()){
                     myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Wolf.png"));
                 }else if(myEnvironment[x][y].isCow()){
-                    myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Cow.png"));
+                    if (myEnvironment[x][y].getSex() == 0)
+                        myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Cow.png"));
+                    else
+                        myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Bull.png"));
                 }else if(myEnvironment[x][y].isDog()) {
                     myPositions.get(new GUIPosition(x, y)).setIcon(new ImageIcon("C:\\Images\\Dog.png"));
                 }else if(myEnvironment[x][y].isMiner()) {

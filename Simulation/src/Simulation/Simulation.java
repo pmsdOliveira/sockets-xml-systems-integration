@@ -193,7 +193,6 @@ public class Simulation extends Thread {
      * Put cows in the environment
      */
     private void putCows(int cows) {
-        int sex = 0;
         int CowID = 0;
         for (int i = 0; i < cows; i++) {
             int posX;
@@ -206,6 +205,7 @@ public class Simulation extends Thread {
             } while (myEnvironment[posX][posY].isObstacle() || myEnvironment[posX][posY].isCow() 
                     || myEnvironment[posX][posY].isWolf() || myEnvironment[posX][posY].isDog() 
                     || myEnvironment[posX][posY].isMiner());
+            myEnvironment[posX][posY].setSex(new Random().nextInt(2));
             myEnvironment[posX][posY].setCow(true);
             myEnvironment[posX][posY].setEntity("Cow_" + CowID);
             TPosition tPosition = new TPosition();
@@ -384,6 +384,8 @@ public class Simulation extends Thread {
                     //updateCowPosition
                     int lastX = this.cowList.get(cowName).getXx(); //Last position Xx
                     int lastY = this.cowList.get(cowName).getYy(); //Last position Yy
+                    int sex = this.myEnvironment[lastX][lastY].getSex();
+                    
                     if (!(this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isWolf() //New position without Wolf
                             && this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].getGrass() == 0) //With grass
                             && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isObstacle() //Without obstacle
@@ -392,10 +394,12 @@ public class Simulation extends Thread {
                             && !this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isMiner()) {  //Without dog
                         this.myEnvironment[lastX][lastY].setEntity(null); //Remove from last postion
                         this.myEnvironment[lastX][lastY].setCow(false); //Remove from last position
+                        this.myEnvironment[lastX][lastY].setSex(0);
                         this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setEntity(cowName); //Put in new position
                         this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setCow(true); //Put in new position
                         this.cowList.get(cowName).setXx(myPlace.getPosition().getXx()); //Put in new position
                         this.cowList.get(cowName).setYy(myPlace.getPosition().getYy()); //Put in new position
+                        this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].setSex(sex);
                     } else {
                         if (this.myEnvironment[myPlace.getPosition().getXx()][myPlace.getPosition().getYy()].isWolf()) { //Wolf than eats a Cow
                             this.myEnvironment[lastX][lastY].setEntity(null); //Remove from last position
